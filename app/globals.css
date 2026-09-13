@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: theme('colors.paper');
+  color: theme('colors.ink');
+  -webkit-font-smoothing: antialiased;
+  text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Respect reduced-motion preferences everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  /* ---- Page shell ---- */
+  .shell {
+    @apply mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-paper;
+  }
+
+  .page-body {
+    @apply flex-1 px-4 pb-10 pt-4;
+  }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    @apply sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-brand px-3 text-white;
+    min-height: 56px;
+  }
+
+  .topbar-title {
+    @apply flex-1 truncate font-display text-[17px] font-bold tracking-tight;
+  }
+
+  .topbar-btn {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/90 transition-colors hover:bg-white/10 active:bg-white/15;
+  }
+
+  /* ---- Ticket / hero panel: the one bold structural motif ---- */
+  .ticket {
+    @apply relative overflow-hidden rounded-ticket bg-gradient-to-br from-brand to-brand-dark text-white shadow-sm;
+  }
+
+  .ticket-notch {
+    @apply pointer-events-none absolute inset-y-0 -right-3 flex w-6 flex-col justify-evenly opacity-90;
+  }
+
+  .ticket-notch span {
+    @apply block h-2 w-2 rounded-full bg-paper;
+  }
+
+  .tear-line {
+    @apply my-3 border-t border-dashed border-white/25;
+  }
+
+  /* ---- Standard panel / card ---- */
+  .panel {
+    @apply rounded-ticket border border-line bg-white p-4;
+  }
+
+  .panel + .panel {
+    @apply mt-3;
+  }
+
+  .section-label {
+    @apply mb-2 mt-6 flex items-center justify-between text-[13px] font-semibold uppercase tracking-wide text-ink/50;
+  }
+
+  .section-label:first-child {
+    @apply mt-0;
+  }
+
+  /* ---- Buttons ---- */
+  .btn {
+    @apply inline-flex min-h-[46px] w-full select-none items-center justify-center gap-2 rounded-full px-5 text-[15px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand text-white hover:bg-brand-dark active:bg-brand-dark;
+  }
+
+  .btn-gold {
+    @apply btn bg-gold text-ink hover:brightness-95;
+  }
+
+  .btn-outline {
+    @apply btn border border-brand text-brand hover:bg-brand/5;
+  }
+
+  .btn-ghost {
+    @apply btn text-brand hover:bg-brand/5;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger text-white hover:brightness-95;
+  }
+
+  .btn-sm {
+    @apply min-h-[38px] px-4 text-[13px];
+  }
+
+  .btn-auto {
+    @apply w-auto;
+  }
+
+  /* ---- Form controls ---- */
+  .field-label {
+    @apply mb-1 block text-[13px] font-medium text-ink/60;
+  }
+
+  .input,
+  select.input,
+  textarea.input {
+    @apply block w-full min-h-[46px] rounded-lg border border-line bg-white px-3 text-[15px] text-ink outline-none transition-colors focus:border-brand;
+  }
+
+  textarea.input {
+    min-height: 84px;
+    padding-top: 0.6rem;
+  }
+
+  /* ---- Data chips (booking codes, plates, QR ids) ---- */
+  .data-chip {
+    @apply inline-block whitespace-nowrap rounded-md border border-line bg-paper px-2 py-1 font-mono text-[12px] tracking-tight text-ink/80;
+  }
+
+  /* ---- Status badge ---- */
+  .badge {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
+  }
+
+  .badge-success { @apply badge bg-success/10 text-success; }
+  .badge-warning { @apply badge bg-warning/10 text-warning; }
+  .badge-danger { @apply badge bg-danger/10 text-danger; }
+  .badge-neutral { @apply badge bg-ink/10 text-ink/70; }
+  .badge-brand { @apply badge bg-brand/10 text-brand; }
+
+  /* ---- Step tracker (genuinely sequential trip status) ---- */
+  .step-tracker {
+    @apply flex w-full items-center;
+  }
+
+  .step-dot {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-line bg-white text-[11px] font-bold text-ink/30 transition-colors;
+  }
+
+  .step-dot.is-done {
+    @apply border-brand bg-brand text-white;
+  }
+
+  .step-dot.is-current {
+    @apply border-brand bg-white text-brand;
+  }
+
+  .step-line {
+    @apply h-[2px] flex-1 bg-line transition-colors;
+  }
+
+  .step-line.is-done {
+    @apply bg-brand;
+  }
+
+  /* ---- Empty state ---- */
+  .empty-state {
+    @apply flex flex-col items-center gap-1 rounded-ticket border border-dashed border-line px-4 py-10 text-center text-ink/50;
+  }
+
+  /* ---- List rows ---- */
+  .row {
+    @apply flex items-center gap-3 border-b border-line py-3 last:border-b-0;
+  }
+
+  .avatar {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand font-display text-[15px] font-bold text-white;
+  }
+
+  /* ---- Bottom tab bar ---- */
+  .tabbar {
+    @apply sticky bottom-0 z-20 grid border-t border-line bg-white pb-[env(safe-area-inset-bottom)];
+  }
+
+  .tab-item {
+    @apply flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium text-ink/45 transition-colors;
+  }
+
+  .tab-item.is-active {
+    @apply text-brand;
+  }
+
+  /* ---- Mock map (no external API, keeps the app fully offline-safe) ---- */
+  .mock-map {
+    @apply relative h-[190px] w-full overflow-hidden rounded-ticket border border-line;
+    background:
+      linear-gradient(135deg, #DCE9D3 0%, #EAF0E4 45%, #D9E5F1 100%);
+  }
+
+  .mock-map-road {
+    @apply absolute h-11 w-[140%] -translate-x-1/2 -translate-y-1/2 rotate-[-16deg] border-y-[3px] border-white bg-white/70;
+    left: 50%;
+    top: 46%;
+  }
+
+  .mock-map-pin {
+    @apply absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-brand shadow;
+  }
+
+  .mock-map-pin.is-driver {
+    @apply bg-success;
+  }
+}
+
+@layer utilities {
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
