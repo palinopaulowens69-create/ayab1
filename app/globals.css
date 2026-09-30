@@ -6,9 +6,18 @@
   color-scheme: light;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 html,
 body {
   height: 100%;
+}
+
+html.dark body {
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 body {
@@ -17,10 +26,20 @@ body {
   -webkit-font-smoothing: antialiased;
   text-size-adjust: 100%;
   overscroll-behavior-y: none;
+  font-feature-settings: 'ss01' on;
 }
 
 * {
   box-sizing: border-box;
+}
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid rgb(23 105 224 / 35%);
+  outline-offset: 2px;
 }
 
 /* Respect reduced-motion preferences everywhere. */
@@ -37,6 +56,7 @@ body {
   /* ---- Page shell ---- */
   .shell {
     @apply mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-paper;
+    box-shadow: 0 0 50px rgb(23 54 94 / 6%);
   }
 
   .page-body {
@@ -45,8 +65,8 @@ body {
 
   /* ---- Top bar ---- */
   .topbar {
-    @apply sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-brand px-3 text-white;
-    min-height: 56px;
+    @apply sticky top-0 z-20 flex items-center gap-2 border-b border-line/80 bg-white/95 px-3 text-ink backdrop-blur-md;
+    min-height: 60px;
   }
 
   .topbar-title {
@@ -54,12 +74,13 @@ body {
   }
 
   .topbar-btn {
-    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/90 transition-colors hover:bg-white/10 active:bg-white/15;
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-brand transition-colors hover:bg-brand/5 active:bg-brand/10;
   }
 
   /* ---- Ticket / hero panel: the one bold structural motif ---- */
   .ticket {
-    @apply relative overflow-hidden rounded-ticket bg-gradient-to-br from-brand to-brand-dark text-white shadow-sm;
+    @apply relative overflow-hidden rounded-ticket bg-brand text-white;
+    box-shadow: 0 8px 20px rgb(23 105 224 / 13%);
   }
 
   .ticket-notch {
@@ -76,7 +97,8 @@ body {
 
   /* ---- Standard panel / card ---- */
   .panel {
-    @apply rounded-ticket border border-line bg-white p-4;
+    @apply rounded-ticket border border-line/80 bg-white p-4;
+    box-shadow: 0 3px 12px rgb(26 55 91 / 4%);
   }
 
   .panel + .panel {
@@ -97,7 +119,8 @@ body {
   }
 
   .btn-primary {
-    @apply btn bg-brand text-white hover:bg-brand-dark active:bg-brand-dark;
+    @apply btn bg-brand text-white shadow-sm hover:bg-brand-dark active:bg-brand-dark;
+    box-shadow: 0 5px 14px rgb(23 105 224 / 18%);
   }
 
   .btn-gold {
@@ -132,7 +155,7 @@ body {
   .input,
   select.input,
   textarea.input {
-    @apply block w-full min-h-[46px] rounded-lg border border-line bg-white px-3 text-[15px] text-ink outline-none transition-colors focus:border-brand;
+    @apply block w-full min-h-[46px] rounded-xl border border-line bg-white px-3 text-[15px] text-ink outline-none transition-colors focus:border-brand;
   }
 
   textarea.input {
@@ -197,37 +220,134 @@ body {
 
   /* ---- Bottom tab bar ---- */
   .tabbar {
-    @apply sticky bottom-0 z-20 grid border-t border-line bg-white pb-[env(safe-area-inset-bottom)];
+    @apply sticky bottom-0 z-20 grid border-t border-line/80 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md;
   }
 
   .tab-item {
     @apply flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium text-ink/45 transition-colors;
+    min-height: 58px;
   }
 
   .tab-item.is-active {
-    @apply text-brand;
+    @apply font-semibold text-brand;
   }
 
-  /* ---- Mock map (no external API, keeps the app fully offline-safe) ---- */
-  .mock-map {
-    @apply relative h-[190px] w-full overflow-hidden rounded-ticket border border-line;
-    background:
-      linear-gradient(135deg, #DCE9D3 0%, #EAF0E4 45%, #D9E5F1 100%);
+  /* ---- OpenStreetMap / Leaflet ride map ---- */
+  .ride-map-frame {
+    @apply overflow-hidden rounded-ticket border border-line bg-white;
   }
 
-  .mock-map-road {
-    @apply absolute h-11 w-[140%] -translate-x-1/2 -translate-y-1/2 rotate-[-16deg] border-y-[3px] border-white bg-white/70;
-    left: 50%;
-    top: 46%;
+  .ride-map-canvas {
+    height: 245px;
+    width: 100%;
+    background: #eaf0f6;
+    z-index: 0;
   }
 
-  .mock-map-pin {
-    @apply absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-brand shadow;
+  .ride-map-fullbleed {
+    @apply absolute inset-0 z-0;
   }
 
-  .mock-map-pin.is-driver {
-    @apply bg-success;
+  .ride-map-fullbleed > .ride-map-loading {
+    @apply absolute inset-0 h-full w-full rounded-none border-0;
   }
+
+  .ride-map-canvas--fullbleed {
+    height: 100%;
+    width: 100%;
+  }
+
+  .ride-map-fullbleed .leaflet-control-attribution {
+    bottom: auto;
+    top: 8px;
+    right: 8px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 75%);
+    font-size: 9px;
+  }
+
+  .ride-map-loading {
+    @apply h-[245px] w-full animate-pulse rounded-ticket border border-line bg-[#eaf0f6];
+  }
+
+  .ride-marker-wrap {
+    background: transparent;
+    border: 0;
+  }
+
+  .ride-marker {
+    align-items: center;
+    border: 3px solid white;
+    border-radius: 999px;
+    box-shadow: 0 2px 10px rgb(20 36 57 / 35%);
+    color: white;
+    display: flex;
+    font: 700 12px/1 var(--font-display);
+    height: 34px;
+    justify-content: center;
+    width: 34px;
+  }
+
+  .ride-marker--pickup { background: #1769e0; }
+  .ride-marker--destination { background: #e34c4c; }
+
+  .ride-marker--driver {
+    background: #13845c;
+    height: 38px;
+    width: 38px;
+  }
+
+  .ride-marker--driver span {
+    background: white;
+    border: 2px solid rgb(255 255 255 / 55%);
+    border-radius: 999px;
+    height: 10px;
+    width: 10px;
+  }
+
+  .ride-map-key {
+    @apply flex flex-wrap gap-x-4 gap-y-1 px-3 py-2 text-[11px] text-ink/60;
+  }
+
+  .ride-map-key > span {
+    @apply inline-flex items-center gap-1.5;
+  }
+
+  .ride-map-key i {
+    @apply block h-2.5 w-2.5 rounded-full;
+  }
+
+  .ride-map-key-driver { background: #13845c; }
+  .ride-map-key-pickup { background: #1769e0; }
+  .ride-map-key-destination { background: #e34c4c; }
+}
+
+@layer components {
+  .dark .shell { @apply bg-[#0F172A]; box-shadow: none; }
+  .dark .topbar { @apply border-slate-700/70 bg-[#1E293B]/95 text-slate-100; }
+  .dark .panel { @apply border-slate-700/50 bg-[#1E293B] text-slate-100; box-shadow: 0 2px 10px rgb(2 6 23 / 18%); }
+  .dark .section-label { @apply text-slate-400; }
+  .dark .field-label { @apply text-slate-300; }
+  .dark .input,
+  .dark select.input,
+  .dark textarea.input { @apply border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-400 focus:border-blue-400; }
+  .dark .data-chip { @apply border-slate-600 bg-slate-800 text-slate-200; }
+  .dark .row { @apply border-slate-700; }
+  .dark .avatar { @apply bg-[#315b91] text-blue-50; }
+  .dark .empty-state { @apply border-slate-600 text-slate-400; }
+  .dark .tabbar { @apply border-slate-700 bg-slate-900/95; }
+  .dark .tab-item { @apply text-slate-400; }
+  .dark .tab-item.is-active { @apply text-blue-300; }
+  .dark .btn-primary { @apply bg-[#3B82C4] hover:bg-[#4B91D1] active:bg-[#3577B2]; box-shadow: 0 5px 14px rgb(15 23 42 / 35%); }
+  .dark .btn-outline { @apply border-blue-400 text-blue-300 hover:bg-blue-400/10; }
+  .dark .btn-ghost { @apply text-blue-300 hover:bg-blue-400/10; }
+  .dark .badge-neutral { @apply bg-slate-700 text-slate-200; }
+  .dark .ride-map-frame { @apply border-slate-700 bg-slate-900; }
+  .dark .ride-map-loading { @apply border-slate-700 bg-slate-800; }
+}
+
+.dark .ride-map-fullbleed .leaflet-tile {
+  filter: brightness(0.72) saturate(0.78);
 }
 
 @layer utilities {
@@ -236,5 +356,116 @@ body {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+}
+
+/* Keep legacy light-theme utility colors readable inside every demo screen. */
+@layer utilities {
+  .dark .shell.bg-slate-50,
+  .dark .shell[class~="bg-[#f5f7fa]"],
+  .dark .shell[class~="bg-[#F8FAFC]"] {
+    background-color: #0f172a;
+  }
+
+  .dark .shell .panel,
+  .dark .shell [class~="bg-white"] {
+    background-color: #1e293b;
+  }
+
+  .dark .shell [class~="bg-slate-50"],
+  .dark .shell [class~="bg-slate-100"],
+  .dark .shell [class~="bg-[#f1f4f8]"],
+  .dark .shell [class~="bg-[#f1f5f9]"],
+  .dark .shell [class~="bg-[#f1f6fd]"],
+  .dark .shell [class~="bg-[#f3f6fa]"],
+  .dark .shell [class~="bg-[#f5f7fa]"],
+  .dark .shell [class~="bg-[#f7edda]"],
+  .dark .shell [class~="bg-[#fff9ed]"],
+  .dark .shell [class~="bg-blue-50"],
+  .dark .shell [class~="bg-blue-100"],
+  .dark .shell [class~="bg-emerald-50"],
+  .dark .shell [class~="bg-emerald-100"],
+  .dark .shell [class~="bg-rose-50"] {
+    background-color: #334155;
+  }
+
+  .dark .shell [class~="text-ink"],
+  .dark .shell [class~="text-slate-900"],
+  .dark .shell [class~="text-slate-800"],
+  .dark .shell [class~="text-[#1b2e47]"],
+  .dark .shell [class~="text-[#25374e]"],
+  .dark .shell [class~="text-[#26364b]"],
+  .dark .shell [class~="text-[#26384f]"],
+  .dark .shell [class~="text-[#34465c]"],
+  .dark .shell [class~="text-[#35475c]"],
+  .dark .shell [class~="text-[#3a4d64]"],
+  .dark .shell [class~="text-[#55462c]"] {
+    color: #f1f5f9;
+  }
+
+  .dark .shell [class~="text-slate-700"],
+  .dark .shell [class~="text-slate-600"],
+  .dark .shell [class~="text-ink/75"],
+  .dark .shell [class~="text-ink/70"],
+  .dark .shell [class~="text-ink/60"],
+  .dark .shell [class~="text-ink/55"],
+  .dark .shell [class~="text-[#50657e]"],
+  .dark .shell [class~="text-[#526780]"],
+  .dark .shell [class~="text-[#53657b]"],
+  .dark .shell [class~="text-[#65758a]"],
+  .dark .shell [class~="text-[#6a7f99]"] {
+    color: #cbd5e1;
+  }
+
+  .dark .shell [class~="text-slate-500"],
+  .dark .shell [class~="text-slate-400"],
+  .dark .shell [class~="text-ink/50"],
+  .dark .shell [class~="text-ink/45"],
+  .dark .shell [class~="text-ink/30"],
+  .dark .shell [class~="text-[#738196]"],
+  .dark .shell [class~="text-[#77869a]"],
+  .dark .shell [class~="text-[#78879a]"],
+  .dark .shell [class~="text-[#7b899a]"],
+  .dark .shell [class~="text-[#82745d]"],
+  .dark .shell [class~="text-[#8491a1]"],
+  .dark .shell [class~="text-[#8794a4]"],
+  .dark .shell [class~="text-[#8996a6]"],
+  .dark .shell [class~="text-[#93a0af]"],
+  .dark .shell [class~="text-[#94a0ae]"],
+  .dark .shell [class~="text-[#9aa6b4]"],
+  .dark .shell [class~="text-[#a0aab6]"] {
+    color: #a7b4c5;
+  }
+
+  .dark .shell [class~="text-emerald-700"],
+  .dark .shell [class~="text-emerald-600"] { color: #86efac; }
+  .dark .shell [class~="text-amber-400"] { color: #fcd34d; }
+  .dark .shell [class~="text-red-600"],
+  .dark .shell [class~="text-rose-500"] { color: #fda4af; }
+
+  .dark .shell [class~="text-brand"],
+  .dark .shell [class~="text-[#104fae]"],
+  .dark .shell [class~="text-[#1769e0]"],
+  .dark .shell [class~="text-[#245d9f]"],
+  .dark .shell [class~="text-[#4778b4]"] {
+    color: #93c5fd;
+  }
+
+  .dark .shell [class~="text-[#073f2a]"] { color: #bbf7d0; }
+  .dark .shell [class~="text-[#a87523]"] { color: #fcd98b; }
+  .dark .shell [class~="text-[#d57437]"],
+  .dark .shell [class~="text-[#e34c4c]"] { color: #fca5a5; }
+
+  .dark .shell .input,
+  .dark .shell input,
+  .dark .shell select,
+  .dark .shell textarea {
+    color: #f1f5f9;
+  }
+
+  .dark .shell input::placeholder,
+  .dark .shell textarea::placeholder {
+    color: #94a3b8;
+    opacity: 1;
   }
 }

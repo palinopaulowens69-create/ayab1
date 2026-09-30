@@ -1,19 +1,20 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './lib/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#7A0019',
-          dark: '#520011',
-          light: '#A3122F',
+          DEFAULT: '#1769E0',
+          dark: '#0B4DB3',
+          light: '#4D91F2',
         },
-        gold: '#F0AC00',
-        paper: '#F3F4F6',
-        ink: '#1B1A1E',
-        line: '#E1E2E6',
+        gold: '#F2B84B',
+        paper: '#F3F7FC',
+        ink: '#17243A',
+        line: '#DFE8F3',
         success: '#1E7A46',
         warning: '#B5790A',
         danger: '#B3261E',

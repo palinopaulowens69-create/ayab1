@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { BackIcon } from './Icons';
+import { ThemeToggle } from './ThemeToggle';
 
 export function PageHeader({
   title,
@@ -20,7 +21,7 @@ export function PageHeader({
   const showBack = Boolean(backHref || useHistoryBack);
 
   return (
-    <header className="topbar">
+    <header className="topbar relative">
       {showBack ? (
         backHref ? (
           <Link href={backHref} className="topbar-btn" aria-label="Go back">
@@ -34,8 +35,11 @@ export function PageHeader({
       ) : (
         <span className="w-9 shrink-0" aria-hidden="true" />
       )}
-      <h1 className="topbar-title">{title}</h1>
-      {action ?? <span className="w-9 shrink-0" aria-hidden="true" />}
+      <h1 className="topbar-title absolute left-1/2 w-[calc(100%-176px)] -translate-x-1/2 text-center">{title}</h1>
+      <div className="ml-auto flex shrink-0 items-center gap-1">
+        {action}
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

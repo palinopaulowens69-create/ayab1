@@ -3,13 +3,14 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ANNOUNCEMENTS, BOOKINGS, DRIVERS, INCIDENTS, USERS } from './mock-data';
 import { clearAllAyabData, loadItem, saveItem } from './storage';
-import { distanceKm, estimateFare, newId } from './utils';
+import { distanceKm, estimateFareForCategory, newId } from './utils';
 import type {
   Announcement,
   AppNotification,
   Booking,
   BookingStatus,
   Driver,
+  FareCategory,
   Incident,
   IncidentStatus,
   Place,
@@ -30,7 +31,8 @@ interface AppState {
 interface AppContextValue extends AppState {
   login: (email: string, password: string) => User | null;
   logout: () => void;
-  createBooking: (pickup: Place, destination: Place) => Booking;
+  updateUserProfile: (userId: string, profile: Partial<Pick<User, 'name' | 'phone'>>) => void;
+  createBooking: (pickup: Place, destination: Place, fareCategory: FareCategory) => Booking;
   cancelBooking: (bookingId: string) => void;
   acceptBooking: (bookingId: string, driverId: string) => void;
   verifyBooking: (bookingId: string) => void;
@@ -38,6 +40,7 @@ interface AppContextValue extends AppState {
   completeTrip: (bookingId: string) => void;
   rateBooking: (bookingId: string, rating: number, review: string) => void;
   toggleDriverOnline: (driverId: string) => void;
+  updateDriverLocation: (driverId: string, lat: number, lng: number) => void;
   setDriverVerified: (driverId: string, verified: boolean) => void;
   setUserStatus: (userId: string, status: User['status']) => void;
   updateIncidentStatus: (incidentId: string, status: IncidentStatus, notes: string) => void;
@@ -164,8 +167,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, currentUser: null }));
   }, []);
 
+  const updateUserProfile = useCallback((userId: string, profile: Partial<Pick<User, 'name' | 'phone'>>) => {
+    setState((s) => ({
+      ...s,
+      users: s.users.map((user) => user.id === userId ? { ...user, ...profile } : user),
+      drivers: s.drivers.map((driver) => driver.id === userId ? { ...driver, ...profile } : driver),
+    }));
+  }, []);
+
   const createBooking = useCallback(
-    (pickup: Place, destination: Place): Booking => {
+    (pickup: Place, destination: Place, fareCategory: FareCategory): Booking => {
       const distance = Math.max(0.3, distanceKm(pickup, destination));
       const booking: Booking = {
         id: newId('AYAB'),
@@ -174,7 +185,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         pickup,
         destination,
         distance,
-        fare: estimateFare(distance),
+        fare: estimateFareForCategory(destination, fareCategory),
+        fareCategory,
         status: 'searching',
         createdAt: new Date().toISOString(),
       };
@@ -261,6 +273,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const updateDriverLocation = useCallback((driverId: string, lat: number, lng: number) => {
+    setState((s) => ({
+      ...s,
+      drivers: s.drivers.map((d) =>
+        d.id === driverId ? { ...d, lat, lng, locationUpdatedAt: new Date().toISOString() } : d,
+      ),
+    }));
+  }, []);
+
   const setDriverVerified = useCallback((driverId: string, verified: boolean) => {
     setState((s) => ({
       ...s,
@@ -328,6 +349,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...state,
       login,
       logout,
+      updateUserProfile,
       createBooking,
       cancelBooking,
       acceptBooking,
@@ -336,6 +358,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       completeTrip,
       rateBooking,
       toggleDriverOnline,
+      updateDriverLocation,
       setDriverVerified,
       setUserStatus,
       updateIncidentStatus,
@@ -350,6 +373,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       state,
       login,
       logout,
+      updateUserProfile,
       createBooking,
       cancelBooking,
       acceptBooking,
@@ -358,6 +382,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       completeTrip,
       rateBooking,
       toggleDriverOnline,
+      updateDriverLocation,
       setDriverVerified,
       setUserStatus,
       updateIncidentStatus,

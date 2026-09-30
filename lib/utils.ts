@@ -1,5 +1,5 @@
 import { BASE_FARE, PER_KM_RATE } from './mock-data';
-import type { Place } from './types';
+import type { FareCategory, Place } from './types';
 
 /** Haversine distance in kilometers between two points. */
 export function distanceKm(a: Place, b: Place): number {
@@ -18,6 +18,10 @@ export function distanceKm(a: Place, b: Place): number {
 export function estimateFare(distanceKilometers: number): number {
   const fare = BASE_FARE + distanceKilometers * PER_KM_RATE;
   return Math.round(fare * 100) / 100;
+}
+
+export function estimateFareForCategory(place: Place, category: FareCategory): number {
+  return category === 'regular' ? place.regularFare : place.discountedFare;
 }
 
 export function formatPeso(amount: number): string {

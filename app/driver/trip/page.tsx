@@ -1,21 +1,42 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { StepTracker } from '@/components/StepTracker';
+import { RideMap } from '@/components/RideMap';
 import { CheckIcon, PhoneIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso, initials } from '@/lib/utils';
 
 function Trip() {
-  const { currentUser, bookings, users, verifyBooking, startTrip, completeTrip } = useApp();
+  const { currentUser, bookings, users, drivers, updateDriverLocation, verifyBooking, startTrip, completeTrip } = useApp();
   const router = useRouter();
+  const lastLocationSent = useRef(0);
 
   const trip = bookings
     .filter((b) => b.driverId === currentUser?.id)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .find((b) => ['accepted', 'verified', 'started', 'completed'].includes(b.status));
+
+  const passenger = users.find((u) => u.id === trip?.passengerId);
+  const driver = drivers.find((d) => d.id === currentUser?.id);
+
+  useEffect(() => {
+    if (!trip || !driver?.online || trip.status === 'completed' || !currentUser || !navigator.geolocation) return;
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const now = Date.now();
+        if (now - lastLocationSent.current < 5000) return;
+        lastLocationSent.current = now;
+        updateDriverLocation(currentUser.id, position.coords.latitude, position.coords.longitude);
+      },
+      () => undefined,
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }, [trip?.id, trip?.status, driver?.online, currentUser?.id, updateDriverLocation]);
 
   if (!trip) {
     return (
@@ -31,8 +52,6 @@ function Trip() {
     );
   }
 
-  const passenger = users.find((u) => u.id === trip.passengerId);
-
   return (
     <div className="shell">
       <PageHeader title="Active trip" backHref="/driver/home" />
@@ -40,6 +59,11 @@ function Trip() {
         <div className="panel !mt-0">
           <StepTracker status={trip.status} />
         </div>
+
+        <RideMap pickup={trip.pickup} destination={trip.destination} driver={driver} />
+        {trip.status !== 'completed' && (
+          <p className="mt-2 text-[11px] leading-4 text-ink/50">Allow location access and keep this trip open to share your live driver position.</p>
+        )}
 
         <div className="panel">
           <div className="flex items-center gap-3">

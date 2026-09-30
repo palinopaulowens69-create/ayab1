@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AYAB</string>
+    <string name="title_activity_main">AYAB</string>
+    <string name="package_name">com.ayab.app</string>
+    <string name="custom_url_scheme">com.ayab.app</string>
+</resources>

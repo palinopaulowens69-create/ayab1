@@ -22,6 +22,33 @@ function base(children: ReactNode, props: IconProps) {
 }
 
 export const BackIcon = (p: IconProps) => base(<path d="M15 18l-6-6 6-6" />, p);
+export const ChevronRightIcon = (p: IconProps) => base(<path d="m9 18 6-6-6-6" />, p);
+export const EditIcon = (p: IconProps) =>
+  base(
+    <>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+    </>,
+    p,
+  );
+export const HelpIcon = (p: IconProps) =>
+  base(
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.6 9a2.5 2.5 0 1 1 4.1 1.9c-1.1.9-1.7 1.2-1.7 2.6" />
+      <path d="M12 17h.01" />
+    </>,
+    p,
+  );
+export const SunIcon = (p: IconProps) =>
+  base(
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+    </>,
+    p,
+  );
+export const MoonIcon = (p: IconProps) => base(<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />, p);
 export const BellIcon = (p: IconProps) =>
   base(
     <>
@@ -38,6 +65,11 @@ export const HomeIcon = (p: IconProps) =>
     </>,
     p,
   );
+export const HomeFilledIcon = (p: IconProps) => (
+  <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden="true" {...p}>
+    <path fill="currentColor" d="M3.4 10.2 12 3.6l8.6 6.6a1 1 0 0 1 .4.8v9a1 1 0 0 1-1 1h-5.2v-6.2H9.2V21H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 .4-.8Z" />
+  </svg>
+);
 export const BookIcon = (p: IconProps) =>
   base(
     <>
@@ -158,3 +190,11 @@ export const PhoneIcon = (p: IconProps) =>
     p,
   );
 export const NavigationIcon = (p: IconProps) => base(<path d="M3 11l18-8-8 18-2-8-8-2Z" />, p);
+export const MapPinIcon = (p: IconProps) =>
+  base(
+    <>
+      <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </>,
+    p,
+  );

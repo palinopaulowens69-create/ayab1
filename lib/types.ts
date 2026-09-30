@@ -1,4 +1,5 @@
 export type Role = 'commuter' | 'driver' | 'admin';
+export type FareCategory = 'regular' | 'discounted';
 
 export type BookingStatus =
   | 'searching'
@@ -31,6 +32,7 @@ export interface Driver extends User {
   lat: number;
   lng: number;
   eta: number;
+  locationUpdatedAt?: string;
 }
 
 export interface Place {
@@ -38,6 +40,8 @@ export interface Place {
   name: string;
   lat: number;
   lng: number;
+  discountedFare: number;
+  regularFare: number;
 }
 
 export interface Booking {
@@ -49,6 +53,7 @@ export interface Booking {
   destination: Place;
   distance: number;
   fare: number;
+  fareCategory?: FareCategory;
   status: BookingStatus;
   createdAt: string;
   rating?: number;
