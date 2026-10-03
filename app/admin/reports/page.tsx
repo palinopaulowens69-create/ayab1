@@ -1,3 +1,4 @@
+// Purpose: View service and driver reports.
 'use client';
 
 import { RequireRole } from '@/components/RequireRole';
@@ -5,6 +6,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { BottomTabs } from '@/components/BottomTabs';
 import { useApp } from '@/lib/store';
 import { formatPeso } from '@/lib/utils';
+
 
 function ReportsAdmin() {
   const { bookings, drivers } = useApp();

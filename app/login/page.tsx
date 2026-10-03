@@ -1,3 +1,4 @@
+// Purpose: Sign users in to their account.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -10,6 +11,7 @@ const DEMO_ACCOUNTS = [
   { label: 'Driver', email: 'driver@ayab.com' },
   { label: 'Admin', email: 'admin@ayab.com' },
 ];
+
 
 export default function LoginPage() {
   const { mounted, currentUser, login } = useApp();
@@ -57,7 +59,9 @@ export default function LoginPage() {
       <div aria-hidden="true" className="pointer-events-none absolute -left-28 -top-32 h-80 w-80 rounded-full bg-blue-100/60 blur-3xl" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 -right-24 h-96 w-96 rounded-full bg-slate-200/70 blur-3xl" />
 
+      
       <section className="relative w-full max-w-[440px] overflow-hidden rounded-[28px] border border-white/80 bg-white shadow-[0_24px_80px_rgba(30,55,90,0.12)]">
+        
         <header className="relative overflow-hidden bg-gradient-to-br from-[#edf6ff] via-[#eaf4ff] to-[#dcecff] px-7 pb-7 pt-8 sm:px-9 sm:pt-9">
           <div aria-hidden="true" className="absolute -right-10 -top-12 h-48 w-48 rounded-full border-[28px] border-white/30" />
           <div aria-hidden="true" className="absolute bottom-0 right-16 h-20 w-20 rounded-full bg-white/25 blur-xl" />
@@ -66,14 +70,12 @@ export default function LoginPage() {
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1769e0] text-[11px] font-extrabold tracking-tight text-white">A</span>
               <span className="font-display text-[12px] font-extrabold tracking-[0.2em] text-[#174b91]">AYAB</span>
             </div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.17em] text-[#3977b9]">Your local ride, made easy</p>
             <h1 className="font-display text-[32px] font-extrabold leading-[1.12] tracking-[-0.045em] text-[#172b45] sm:text-[36px]">
-              Your Ride.<br />Your way.
+              Maysa nga AYAB<br />May tricy agad.
             </h1>
             <div className="mt-5 flex items-center gap-3">
               <span className="h-9 w-1 rounded-full bg-[#1769e0]" />
               <div>
-                <p className="text-[15px] font-semibold tracking-[-0.01em] text-[#243d5c]">TODA na &apos;to!</p>
                 <p className="mt-0.5 text-[13px] font-medium text-[#647b97]">Tuguegarao City, Philippines</p>
               </div>
             </div>
@@ -86,6 +88,7 @@ export default function LoginPage() {
             <p className="mt-1 text-[13px] text-[#7a899b]">Sign in to continue to your AYAB account.</p>
           </div>
 
+          
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="mb-2 block text-[13px] font-semibold text-[#34465c]" htmlFor="email">Email</label>
@@ -129,6 +132,7 @@ export default function LoginPage() {
             </button>
           </form>
 
+          
           <div className="mt-7 border-t border-[#edf0f4] pt-5">
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-[12px] font-semibold text-[#53657a]">Choose a Demo Account</p>

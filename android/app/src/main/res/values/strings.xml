@@ -1,4 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!-- Nandito ang Android app strings na ginagamit ng native resources. -->
 <resources>
     <string name="app_name">AYAB</string>
     <string name="title_activity_main">AYAB</string>

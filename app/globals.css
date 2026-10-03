@@ -1,23 +1,13 @@
+/* Dito nakalagay ang global styles, color tokens, layout helpers, at responsive UI rules ng AYAB. */
+/* Tailwind directives are intentionally used here; suppress CSS validator warnings for them. */
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-}
-
-html.dark {
-  color-scheme: dark;
-}
-
 html,
 body {
   height: 100%;
-}
-
-html.dark body {
-  background: #0f172a;
-  color: #e2e8f0;
 }
 
 body {
@@ -361,6 +351,7 @@ button, a, input, select, textarea {
 
 /* Keep legacy light-theme utility colors readable inside every demo screen. */
 @layer utilities {
+  /* Set dark page canvases and lifted surfaces used by commuter and driver pages. */
   .dark .shell.bg-slate-50,
   .dark .shell[class~="bg-[#f5f7fa]"],
   .dark .shell[class~="bg-[#F8FAFC]"] {
@@ -389,6 +380,7 @@ button, a, input, select, textarea {
     background-color: #334155;
   }
 
+  /* Use bright text for primary labels and soft neutral text for supporting copy. */
   .dark .shell [class~="text-ink"],
   .dark .shell [class~="text-slate-900"],
   .dark .shell [class~="text-slate-800"],
@@ -437,6 +429,7 @@ button, a, input, select, textarea {
     color: #a7b4c5;
   }
 
+  /* Keep success, warning, error, and brand text readable on dark surfaces. */
   .dark .shell [class~="text-emerald-700"],
   .dark .shell [class~="text-emerald-600"] { color: #86efac; }
   .dark .shell [class~="text-amber-400"] { color: #fcd34d; }
@@ -456,6 +449,7 @@ button, a, input, select, textarea {
   .dark .shell [class~="text-[#d57437]"],
   .dark .shell [class~="text-[#e34c4c]"] { color: #fca5a5; }
 
+  /* Inputs use high-contrast entered text and visible placeholder guidance. */
   .dark .shell .input,
   .dark .shell input,
   .dark .shell select,

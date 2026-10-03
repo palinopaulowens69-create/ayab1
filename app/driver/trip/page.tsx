@@ -1,3 +1,4 @@
+// Purpose: Manage an active ride.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -9,6 +10,7 @@ import { RideMap } from '@/components/RideMap';
 import { CheckIcon, PhoneIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso, initials } from '@/lib/utils';
+
 
 function Trip() {
   const { currentUser, bookings, users, drivers, updateDriverLocation, verifyBooking, startTrip, completeTrip } = useApp();
@@ -28,6 +30,7 @@ function Trip() {
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const now = Date.now();
+        
         if (now - lastLocationSent.current < 5000) return;
         lastLocationSent.current = now;
         updateDriverLocation(currentUser.id, position.coords.latitude, position.coords.longitude);
@@ -81,7 +84,7 @@ function Trip() {
             )}
           </div>
           <div className="row">
-            <span className="text-[13px] text-ink/60">Fare</span>
+            <span className="text-[13px] text-ink/60">{trip.specialRide ? 'Special ride offer' : 'Fare'}</span>
             <span className="ml-auto font-display text-[16px] font-bold text-brand">
               {formatPeso(trip.fare)}
             </span>
@@ -92,6 +95,7 @@ function Trip() {
           </div>
         </div>
 
+        
         {trip.status === 'accepted' && (
           <button onClick={() => verifyBooking(trip.id)} className="btn-primary mt-2">
             <CheckIcon width={17} height={17} /> Scan passenger QR to verify

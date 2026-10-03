@@ -1,3 +1,4 @@
+REM Ito ang Windows launcher script na gumagamit ng naka-configure na Gradle wrapper para sa Android build.
 @rem
 @rem Copyright 2015 the original author or authors.
 @rem

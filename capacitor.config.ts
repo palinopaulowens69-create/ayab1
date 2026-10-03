@@ -1,3 +1,4 @@
+// Itinatakda nito ang app ID, pangalan, at web output folder para sa Capacitor wrapper.
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {

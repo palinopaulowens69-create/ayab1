@@ -1,9 +1,11 @@
+// Purpose: Show the driver QR code.
 'use client';
 
 import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { QrCode } from '@/components/QrCode';
 import { useApp } from '@/lib/store';
+
 
 function DriverQr() {
   const { currentUser, drivers } = useApp();
@@ -25,6 +27,7 @@ function DriverQr() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

@@ -1,3 +1,4 @@
+// Purpose: Review and accept ride requests.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -6,6 +7,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { BottomTabs } from '@/components/BottomTabs';
 import { useApp } from '@/lib/store';
 import { formatPeso } from '@/lib/utils';
+
 
 function Requests() {
   const { currentUser, drivers, bookings, acceptBooking } = useApp();
@@ -16,6 +18,7 @@ function Requests() {
     (b) => b.driverId === currentUser?.id && ['accepted', 'verified', 'started'].includes(b.status),
   );
 
+  
   function accept(bookingId: string) {
     if (!currentUser) return;
     acceptBooking(bookingId, currentUser.id);
@@ -53,7 +56,7 @@ function Requests() {
                 <span className="ml-auto text-[13px] text-ink/60">{r.distance.toFixed(1)} km</span>
               </div>
               <div className="row">
-                <span className="text-[13px] text-ink/60">Fare</span>
+                <span className="text-[13px] text-ink/60">{r.specialRide ? 'Special ride offer' : 'Fare'}</span>
                 <span className="ml-auto font-display text-[16px] font-bold text-brand">
                   {formatPeso(r.fare)}
                 </span>
@@ -73,6 +76,7 @@ function Requests() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

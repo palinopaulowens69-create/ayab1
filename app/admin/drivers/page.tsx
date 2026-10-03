@@ -1,3 +1,4 @@
+// Purpose: View and manage driver accounts.
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { BottomTabs } from '@/components/BottomTabs';
 import { SearchIcon, StarIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { initials } from '@/lib/utils';
+
 
 function DriversAdmin() {
   const { drivers, setDriverVerified, setUserStatus } = useApp();

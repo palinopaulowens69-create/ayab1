@@ -1,3 +1,4 @@
+// Purpose: View ride and service notifications.
 'use client';
 
 import { useEffect } from 'react';
@@ -7,6 +8,7 @@ import { BellIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatDate } from '@/lib/utils';
 
+
 function Notifications() {
   const { currentUser, notifications, markAllNotificationsRead } = useApp();
   const mine = notifications
@@ -15,7 +17,7 @@ function Notifications() {
 
   useEffect(() => {
     if (currentUser) markAllNotificationsRead(currentUser.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [currentUser?.id]);
 
   return (
@@ -40,6 +42,7 @@ function Notifications() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

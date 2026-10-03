@@ -1,3 +1,4 @@
+// Purpose: Show an overview of service activity.
 'use client';
 
 import Link from 'next/link';
@@ -7,6 +8,7 @@ import { BottomTabs } from '@/components/BottomTabs';
 import { AlertIcon, ChartIcon, MegaphoneIcon, ShieldIcon, UserIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso } from '@/lib/utils';
+
 
 function Dashboard() {
   const { users, drivers, bookings, incidents } = useApp();

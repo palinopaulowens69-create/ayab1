@@ -1,8 +1,7 @@
+// Ito ang shared root layout ng app; dito inilalagay ang font setup, global styles, theme provider, at shared app state.
 import type { Metadata, Viewport } from 'next';
 import { Archivo, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
-import Script from 'next/script';
 import type { ReactNode } from 'react';
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { AppProvider } from '@/lib/store';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
@@ -42,20 +41,12 @@ export const viewport: Viewport = {
   themeColor: '#1769E0',
 };
 
+// Tumatanggap ng children at ibinabalik ang shared HTML layout kasama ang fonts at app state provider.
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="font-body">
-        <Script
-          id="ayab-theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: "try{const t=localStorage.getItem('ayab-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch{}",
-          }}
-        />
-        <ThemeProvider>
-          <AppProvider>{children}</AppProvider>
-        </ThemeProvider>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

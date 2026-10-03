@@ -1,3 +1,4 @@
+// Itinatakda nito ang shared Gradle plugins at repository configuration para sa Android project.
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {

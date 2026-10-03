@@ -1,8 +1,10 @@
+// Purpose: Redirect users to the correct page.
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useApp } from '@/lib/store';
+
 
 export default function RootPage() {
   const { mounted, currentUser } = useApp();

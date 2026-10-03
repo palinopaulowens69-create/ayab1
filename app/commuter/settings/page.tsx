@@ -1,3 +1,4 @@
+// Purpose: Manage commuter settings.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -6,11 +7,13 @@ import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { useApp } from '@/lib/store';
 
+
 function Settings() {
   const { resetDemoData } = useApp();
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
 
+  
   function handleReset() {
     resetDemoData();
     router.replace('/login');
@@ -52,6 +55,7 @@ function Settings() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

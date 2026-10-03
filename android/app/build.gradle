@@ -1,3 +1,4 @@
+// Itinatakda nito ang Android app SDK versions, build types, plugins, at dependencies.
 apply plugin: 'com.android.application'
 
 android {

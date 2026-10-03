@@ -1,11 +1,12 @@
+// Nagbibigay ito ng shared page header na may optional back action, page action, at theme toggle.
 'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { BackIcon } from './Icons';
-import { ThemeToggle } from './ThemeToggle';
 
+// Tumatanggap ng title at optional back/action props; ibinabalik ang reusable header at navigation controls.
 export function PageHeader({
   title,
   backHref,
@@ -21,6 +22,7 @@ export function PageHeader({
   const showBack = Boolean(backHref || useHistoryBack);
 
   return (
+    // Reusable title bar with optional back navigation and page action.
     <header className="topbar relative">
       {showBack ? (
         backHref ? (
@@ -38,7 +40,6 @@ export function PageHeader({
       <h1 className="topbar-title absolute left-1/2 w-[calc(100%-176px)] -translate-x-1/2 text-center">{title}</h1>
       <div className="ml-auto flex shrink-0 items-center gap-1">
         {action}
-        <ThemeToggle />
       </div>
     </header>
   );

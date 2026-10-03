@@ -1,3 +1,4 @@
+// Nandito ang TypeScript types para sa users, rides, fare, incidents, anunsyo, notifications, at trip steps.
 export type Role = 'commuter' | 'driver' | 'admin';
 export type FareCategory = 'regular' | 'discounted';
 
@@ -54,6 +55,7 @@ export interface Booking {
   distance: number;
   fare: number;
   fareCategory?: FareCategory;
+  specialRide?: boolean;
   status: BookingStatus;
   createdAt: string;
   rating?: number;
@@ -89,6 +91,7 @@ export interface AppNotification {
   date: string;
 }
 
+// Order at label ng mga hakbang na ipinapakita sa trip progress tracker.
 export const TRIP_STEPS: { key: BookingStatus; label: string }[] = [
   { key: 'searching', label: 'Finding driver' },
   { key: 'accepted', label: 'Driver assigned' },

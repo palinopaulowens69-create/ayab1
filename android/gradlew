@@ -1,4 +1,5 @@
 #!/bin/sh
+# Ito ang launcher script sa Unix para patakbuhin ang Gradle wrapper ng Android app.
 
 #
 # Copyright © 2015-2021 the original authors.

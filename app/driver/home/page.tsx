@@ -1,3 +1,4 @@
+// Purpose: Show driver status, requests, and earnings.
 'use client';
 
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import { formatPeso } from '@/lib/utils';
 import type { Booking } from '@/lib/types';
 
 type MatchingMode = 'auto' | 'manual';
+
 
 function DriverHome() {
   const { currentUser, drivers, bookings, toggleDriverOnline, acceptBooking } = useApp();
@@ -73,6 +75,7 @@ function DriverHome() {
     <div className="shell bg-slate-50">
       <PageHeader title="AYAB Driver" />
       <div className="page-body space-y-5 !px-4 !pb-28 !pt-5">
+        
         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1769e0] via-[#206fd9] to-[#104da9] p-5 text-white shadow-[0_12px_28px_rgba(23,92,190,0.2)]">
           <span aria-hidden="true" className="absolute -right-12 -top-16 h-48 w-48 rounded-full border-[26px] border-white/[0.08]" />
           <div className="relative flex items-center justify-between gap-3">
@@ -107,6 +110,7 @@ function DriverHome() {
           )}
         </section>
 
+        
         {activeTrip ? (
           <Link href="/driver/trip" className="block rounded-2xl border border-blue-100 bg-white p-4 shadow-sm transition hover:shadow-md">
             <p className="text-[10px] font-bold uppercase tracking-[0.13em] text-[#1769e0]">Active trip</p>
@@ -146,6 +150,7 @@ function DriverHome() {
           </section>
         )}
 
+        
         <section>
           <div className="mb-3 flex items-center justify-between">
             <div>
@@ -199,6 +204,7 @@ function DriverHome() {
           )}
         </section>
 
+        
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-[15px] font-bold text-slate-800">Today</h2>
@@ -219,8 +225,10 @@ function DriverHome() {
           </div>
         </section>
       </div>
+      
       <BottomTabs role="driver" />
 
+      
       {showIncomingRequest && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/45 px-4 pb-5 pt-12 backdrop-blur-[2px] sm:items-center sm:py-6" role="presentation">
           <section role="dialog" aria-modal="true" aria-labelledby="incoming-request-title" className="w-full max-w-[420px] overflow-hidden rounded-[26px] bg-white shadow-[0_24px_80px_rgba(6,21,44,0.32)]">
@@ -262,6 +270,7 @@ function DriverHome() {
         </div>
       )}
 
+      
       {demoAccepted && (
         <div role="status" className="fixed bottom-24 left-1/2 z-[70] -translate-x-1/2 rounded-full bg-slate-900 px-4 py-2.5 text-[11px] font-semibold text-white shadow-lg">
           Demo request accepted

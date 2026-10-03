@@ -1,7 +1,10 @@
+// Nagbibigay ito ng reusable inline SVG icons na ginagamit sa navigation, actions, profile, at maps.
 import type { ReactNode, SVGProps } from 'react';
 
 type IconProps = SVGProps<SVGSVGElement>;
 
+// Shared SVG wrapper keeps icon sizing, stroke, and accessibility consistent.
+// Tumatanggap ng SVG children at props; ibinabalik ang mga ito sa shared accessible SVG wrapper.
 function base(children: ReactNode, props: IconProps) {
   return (
     <svg
@@ -21,8 +24,11 @@ function base(children: ReactNode, props: IconProps) {
   );
 }
 
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis back arrow.
 export const BackIcon = (p: IconProps) => base(<path d="M15 18l-6-6 6-6" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis right chevron.
 export const ChevronRightIcon = (p: IconProps) => base(<path d="m9 18 6-6-6-6" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis edit pencil.
 export const EditIcon = (p: IconProps) =>
   base(
     <>
@@ -31,6 +37,7 @@ export const EditIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis help question mark.
 export const HelpIcon = (p: IconProps) =>
   base(
     <>
@@ -40,6 +47,7 @@ export const HelpIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis sun.
 export const SunIcon = (p: IconProps) =>
   base(
     <>
@@ -48,7 +56,9 @@ export const SunIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis moon.
 export const MoonIcon = (p: IconProps) => base(<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis notification bell.
 export const BellIcon = (p: IconProps) =>
   base(
     <>
@@ -57,6 +67,7 @@ export const BellIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis home outline.
 export const HomeIcon = (p: IconProps) =>
   base(
     <>
@@ -65,11 +76,13 @@ export const HomeIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis filled home.
 export const HomeFilledIcon = (p: IconProps) => (
   <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden="true" {...p}>
     <path fill="currentColor" d="M3.4 10.2 12 3.6l8.6 6.6a1 1 0 0 1 .4.8v9a1 1 0 0 1-1 1h-5.2v-6.2H9.2V21H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 .4-.8Z" />
   </svg>
 );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis booking.
 export const BookIcon = (p: IconProps) =>
   base(
     <>
@@ -78,6 +91,7 @@ export const BookIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis history clock.
 export const HistoryIcon = (p: IconProps) =>
   base(
     <>
@@ -87,6 +101,7 @@ export const HistoryIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis user profile.
 export const UserIcon = (p: IconProps) =>
   base(
     <>
@@ -95,6 +110,7 @@ export const UserIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis settings gear.
 export const SettingsIcon = (p: IconProps) =>
   base(
     <>
@@ -103,6 +119,7 @@ export const SettingsIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis QR code.
 export const QrIcon = (p: IconProps) =>
   base(
     <>
@@ -113,10 +130,14 @@ export const QrIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis check mark.
 export const CheckIcon = (p: IconProps) => base(<path d="M5 13l4 4L19 7" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis close mark.
 export const XIcon = (p: IconProps) => base(<path d="M18 6L6 18M6 6l12 12" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis star.
 export const StarIcon = (p: IconProps) =>
   base(<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1L6.6 19.3l1.3-6-4.6-4.1 6.1-.6L12 3Z" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis logout arrow.
 export const LogOutIcon = (p: IconProps) =>
   base(
     <>
@@ -126,8 +147,10 @@ export const LogOutIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis verification shield.
 export const ShieldIcon = (p: IconProps) =>
   base(<path d="M12 3l7 3v6c0 4.5-3 7.7-7 9-4-1.3-7-4.5-7-9V6l7-3Z" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis users.
 export const UsersIcon = (p: IconProps) =>
   base(
     <>
@@ -138,6 +161,7 @@ export const UsersIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis alert symbol.
 export const AlertIcon = (p: IconProps) =>
   base(
     <>
@@ -147,6 +171,7 @@ export const AlertIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis announcement megaphone.
 export const MegaphoneIcon = (p: IconProps) =>
   base(
     <>
@@ -156,6 +181,7 @@ export const MegaphoneIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis chart.
 export const ChartIcon = (p: IconProps) =>
   base(
     <>
@@ -166,6 +192,7 @@ export const ChartIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis search magnifier.
 export const SearchIcon = (p: IconProps) =>
   base(
     <>
@@ -174,7 +201,9 @@ export const SearchIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis plus sign.
 export const PlusIcon = (p: IconProps) => base(<path d="M12 5v14M5 12h14" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis trash bin.
 export const TrashIcon = (p: IconProps) =>
   base(
     <>
@@ -184,12 +213,15 @@ export const TrashIcon = (p: IconProps) =>
     </>,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis phone handset.
 export const PhoneIcon = (p: IconProps) =>
   base(
     <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.4c1 .3 2 .5 3 .7a2 2 0 0 1 1.6 2Z" />,
     p,
   );
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis navigation arrow.
 export const NavigationIcon = (p: IconProps) => base(<path d="M3 11l18-8-8 18-2-8-8-2Z" />, p);
+// Tumatanggap ng optional SVG props at nagbabalik ng inline icon na hugis map pin.
 export const MapPinIcon = (p: IconProps) =>
   base(
     <>

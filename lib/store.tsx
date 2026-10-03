@@ -1,3 +1,4 @@
+// Ito ang central app state at actions para sa login, bookings, drivers, incidents, anunsyo, at notifications.
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -32,7 +33,7 @@ interface AppContextValue extends AppState {
   login: (email: string, password: string) => User | null;
   logout: () => void;
   updateUserProfile: (userId: string, profile: Partial<Pick<User, 'name' | 'phone'>>) => void;
-  createBooking: (pickup: Place, destination: Place, fareCategory: FareCategory) => Booking;
+  createBooking: (pickup: Place, destination: Place, fareCategory: FareCategory, specialFare?: number) => Booking;
   cancelBooking: (bookingId: string) => void;
   acceptBooking: (bookingId: string, driverId: string) => void;
   verifyBooking: (bookingId: string) => void;
@@ -65,6 +66,7 @@ const SEED: AppState = {
   notifications: [],
 };
 
+// Tumatanggap ng children, naglo-load at nagsi-save ng app state, at nagbibigay ng data at actions sa mga child component.
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(SEED);
   const hydrated = useRef(false);
@@ -89,6 +91,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Keep tabs in sync: if another tab (e.g. a driver logged in alongside a
   // commuter) writes to localStorage, reflect that change here too.
   useEffect(() => {
+    // Tumatanggap ng browser storage event at ina-update ang katumbas na state slice kapag may pagbabago mula sa ibang tab.
     function onStorage(e: StorageEvent) {
       if (!e.key || !e.newValue) return;
       const key = e.key.replace('ayab_', '');
@@ -139,6 +142,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     saveItem('notifications', state.notifications);
   }, [state.mounted, state.notifications]);
 
+  // Tumatanggap ng user ID at message; nagdadagdag ng bagong unread notification na may oras at ID.
   const pushNotification = useCallback((userId: string, message: string) => {
     setState((s) => ({
       ...s,
@@ -149,6 +153,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng email at password; ibinabalik ang aktibong user kapag match ang credentials, o null kung hindi puwedeng mag-login.
   const login = useCallback((email: string, password: string): User | null => {
     let found: User | null = null;
     setState((s) => {
@@ -163,10 +168,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return found;
   }, []);
 
+  // Walang input o return value; nililinis ang kasalukuyang signed-in user.
   const logout = useCallback(() => {
     setState((s) => ({ ...s, currentUser: null }));
   }, []);
 
+  // Tumatanggap ng user ID at bagong pangalan o phone; ina-update ang katugmang user at driver profile.
   const updateUserProfile = useCallback((userId: string, profile: Partial<Pick<User, 'name' | 'phone'>>) => {
     setState((s) => ({
       ...s,
@@ -175,9 +182,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng pickup, destination, at fare category; gumagawa at nagbabalik ng bagong booking na may distansya at pamasahe.
   const createBooking = useCallback(
-    (pickup: Place, destination: Place, fareCategory: FareCategory): Booking => {
+    (pickup: Place, destination: Place, fareCategory: FareCategory, specialFare?: number): Booking => {
       const distance = Math.max(0.3, distanceKm(pickup, destination));
+      const minimumFare = estimateFareForCategory(destination, fareCategory);
+      if (specialFare !== undefined && (!Number.isFinite(specialFare) || specialFare < minimumFare)) {
+        throw new RangeError(`Special ride fare must be at least ${minimumFare}.`);
+      }
       const booking: Booking = {
         id: newId('AYAB'),
         passengerId: state.currentUser?.id ?? 'guest',
@@ -185,8 +197,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         pickup,
         destination,
         distance,
-        fare: estimateFareForCategory(destination, fareCategory),
+        fare: specialFare ?? minimumFare,
         fareCategory,
+        ...(specialFare !== undefined && { specialRide: true }),
         status: 'searching',
         createdAt: new Date().toISOString(),
       };
@@ -196,6 +209,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.currentUser],
   );
 
+  // Tumatanggap ng booking ID at partial na pagbabago; ina-update lang ang katugmang booking sa state.
   const updateBooking = useCallback((bookingId: string, patch: Partial<Booking>) => {
     setState((s) => ({
       ...s,
@@ -203,11 +217,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng booking ID at itinatakda ang status nito sa cancelled.
   const cancelBooking = useCallback(
     (bookingId: string) => updateBooking(bookingId, { status: 'cancelled' as BookingStatus }),
     [updateBooking],
   );
 
+  // Tumatanggap ng booking ID at driver ID; itinatakda ang driver at status, saka nagno-notify sa commuter.
   const acceptBooking = useCallback(
     (bookingId: string, driverId: string) => {
       updateBooking(bookingId, { status: 'accepted', driverId });
@@ -220,16 +236,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.bookings, state.drivers, updateBooking, pushNotification],
   );
 
+  // Tumatanggap ng booking ID at inililipat ang booking sa verified status.
   const verifyBooking = useCallback(
     (bookingId: string) => updateBooking(bookingId, { status: 'verified' }),
     [updateBooking],
   );
 
+  // Tumatanggap ng booking ID at inililipat ang booking sa started status.
   const startTrip = useCallback(
     (bookingId: string) => updateBooking(bookingId, { status: 'started' }),
     [updateBooking],
   );
 
+  // Tumatanggap ng booking ID; tinatapos ang booking, dinadagdagan ang completed trip count ng driver, at nagpapadala ng notification.
   const completeTrip = useCallback(
     (bookingId: string) => {
       updateBooking(bookingId, { status: 'completed' });
@@ -247,6 +266,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.bookings, updateBooking, pushNotification],
   );
 
+  // Tumatanggap ng booking ID, rating, at review; sine-save ang feedback at kinukuwenta ulit ang average rating ng driver.
   const rateBooking = useCallback(
     (bookingId: string, rating: number, review: string) => {
       updateBooking(bookingId, { rating, review });
@@ -256,6 +276,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...s,
         drivers: s.drivers.map((d) => {
           if (d.id !== booking.driverId) return d;
+          // Isinasama ang bagong rating sa mga na-save na rating para makuha ang bagong average ng driver.
           const rated = s.bookings.filter((b) => b.driverId === d.id && b.rating);
           const total = rated.reduce((sum, b) => sum + (b.rating ?? 0), 0) + rating;
           const avg = total / (rated.length + 1);
@@ -266,6 +287,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.bookings, updateBooking],
   );
 
+  // Tumatanggap ng driver ID at binabaligtad ang online status ng driver na iyon.
   const toggleDriverOnline = useCallback((driverId: string) => {
     setState((s) => ({
       ...s,
@@ -273,6 +295,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng driver ID at coordinates; ina-update ang lokasyon at oras ng huling update.
   const updateDriverLocation = useCallback((driverId: string, lat: number, lng: number) => {
     setState((s) => ({
       ...s,
@@ -282,6 +305,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng driver ID at boolean; ina-update ang verification status ng driver.
   const setDriverVerified = useCallback((driverId: string, verified: boolean) => {
     setState((s) => ({
       ...s,
@@ -289,6 +313,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng user ID at account status; ina-update ang user at katugmang driver record.
   const setUserStatus = useCallback((userId: string, status: User['status']) => {
     setState((s) => ({
       ...s,
@@ -297,6 +322,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng incident ID, bagong status, at notes; ina-update ang incident na iyon.
   const updateIncidentStatus = useCallback((incidentId: string, status: IncidentStatus, notes: string) => {
     setState((s) => ({
       ...s,
@@ -304,6 +330,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng title at body; gumagawa ng published announcement na may bagong ID at petsa.
   const addAnnouncement = useCallback((title: string, body: string) => {
     setState((s) => ({
       ...s,
@@ -314,6 +341,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng announcement ID at binabaligtad ang published flag nito.
   const toggleAnnouncementPublished = useCallback((id: string) => {
     setState((s) => ({
       ...s,
@@ -321,10 +349,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng announcement ID at inaalis ang announcement na iyon sa listahan.
   const deleteAnnouncement = useCallback((id: string) => {
     setState((s) => ({ ...s, announcements: s.announcements.filter((a) => a.id !== id) }));
   }, []);
 
+  // Tumatanggap ng notification ID at minamarkahan itong nabasa.
   const markNotificationRead = useCallback((id: string) => {
     setState((s) => ({
       ...s,
@@ -332,6 +362,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Tumatanggap ng user ID at minamarkahang nabasa ang lahat ng notification ng user na iyon.
   const markAllNotificationsRead = useCallback((userId: string) => {
     setState((s) => ({
       ...s,
@@ -339,6 +370,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  // Walang input; nililinis ang saved AYAB data at ibinabalik ang app sa seeded demo state.
   const resetDemoData = useCallback(() => {
     clearAllAyabData();
     setState({ ...SEED, mounted: true, currentUser: null });
@@ -398,6 +430,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 
+// Walang input; ibinabalik ang app context at naghahagis ng error kung wala ito sa loob ng AppProvider.
 export function useApp(): AppContextValue {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error('useApp must be used within AppProvider');

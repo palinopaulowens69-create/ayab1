@@ -1,3 +1,4 @@
+// Purpose: View and manage the admin profile.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,10 +9,12 @@ import { LogOutIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { initials } from '@/lib/utils';
 
+
 function AdminProfile() {
   const { currentUser, logout } = useApp();
   const router = useRouter();
 
+  
   function handleLogout() {
     logout();
     router.replace('/login');
@@ -40,6 +43,7 @@ function AdminProfile() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

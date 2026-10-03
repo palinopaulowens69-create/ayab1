@@ -1,3 +1,4 @@
+// Binubuo nito ang role-specific bottom navigation para sa commuter, driver, at admin.
 'use client';
 
 import Link from 'next/link';
@@ -11,6 +12,7 @@ interface TabDef {
   icon: (active: boolean) => ReactNode;
 }
 
+// Role-specific destinations and icons for the persistent app navigation.
 const TABS: Record<'commuter' | 'driver' | 'admin', TabDef[]> = {
   commuter: [
     { href: '/commuter/home', label: 'Home', icon: (active) => active ? <HomeFilledIcon /> : <HomeIcon /> },
@@ -32,20 +34,22 @@ const TABS: Record<'commuter' | 'driver' | 'admin', TabDef[]> = {
   ],
 };
 
+// Tumatanggap ng role at ibinabalik ang navigation tabs na para sa commuter, driver, o admin.
 export function BottomTabs({ role }: { role: 'commuter' | 'driver' | 'admin' }) {
   const pathname = usePathname();
   const tabs = TABS[role];
   const navClass = role === 'driver'
-    ? 'fixed bottom-0 left-1/2 z-40 grid w-full max-w-[480px] -translate-x-1/2 border-t border-[#e8edf3] bg-white px-2 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-5px_18px_rgba(28,52,82,0.06)] dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/30'
-    : 'sticky bottom-0 z-20 grid border-t border-[#e8edf3] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-5px_18px_rgba(28,52,82,0.04)] backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/95 dark:shadow-black/30';
+    ? 'fixed bottom-0 left-1/2 z-40 grid w-full max-w-[480px] -translate-x-1/2 border-t border-[#e8edf3] bg-white px-2 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-5px_18px_rgba(28,52,82,0.06)]   '
+    : 'sticky bottom-0 z-20 grid border-t border-[#e8edf3] bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] pt-1 shadow-[0_-5px_18px_rgba(28,52,82,0.04)] backdrop-blur-md   ';
 
   return (
+    // Highlights the current route and lays out navigation items evenly.
     <nav className={navClass} style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
       {tabs.map((tab) => {
         const active = pathname === tab.href;
         return (
-          <Link key={tab.href} href={tab.href} aria-current={active ? 'page' : undefined} className={`flex min-h-[62px] flex-col items-center justify-center gap-1 rounded-xl py-2 text-[10px] font-medium transition-colors ${active ? 'font-semibold text-[#1769e0] dark:text-blue-300' : 'text-[#8491a1] hover:text-[#50657e] dark:text-slate-400 dark:hover:text-slate-200'}`}>
-            <span className={`flex h-7 w-9 items-center justify-center rounded-full transition-colors ${active ? 'bg-[#eaf2ff] dark:bg-blue-400/10' : ''}`}>{tab.icon(active)}</span>
+          <Link key={tab.href} href={tab.href} aria-current={active ? 'page' : undefined} className={`flex min-h-[62px] flex-col items-center justify-center gap-1 rounded-xl py-2 text-[10px] font-medium transition-colors ${active ? 'font-semibold text-[#1769e0] ' : 'text-[#8491a1] hover:text-[#50657e]  '}`}>
+            <span className={`flex h-7 w-9 items-center justify-center rounded-full transition-colors ${active ? 'bg-[#eaf2ff] ' : ''}`}>{tab.icon(active)}</span>
             <span>{tab.label}</span>
           </Link>
         );

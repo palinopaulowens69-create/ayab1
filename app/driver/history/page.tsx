@@ -1,3 +1,4 @@
+// Purpose: View completed and cancelled rides.
 'use client';
 
 import { RequireRole } from '@/components/RequireRole';
@@ -6,11 +7,13 @@ import { BottomTabs } from '@/components/BottomTabs';
 import { useApp } from '@/lib/store';
 import { formatDate, formatPeso } from '@/lib/utils';
 
+
 function statusBadgeClass(status: string) {
   if (status === 'completed') return 'badge-success';
   if (status === 'cancelled') return 'badge-danger';
   return 'badge-brand';
 }
+
 
 function DriverHistory() {
   const { currentUser, bookings } = useApp();
@@ -51,6 +54,7 @@ function DriverHistory() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

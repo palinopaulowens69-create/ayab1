@@ -1,3 +1,4 @@
+// Purpose: Manage service announcements.
 'use client';
 
 import type { FormEvent } from 'react';
@@ -9,11 +10,13 @@ import { PlusIcon, TrashIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatDate } from '@/lib/utils';
 
+
 function AnnouncementsAdmin() {
   const { announcements, addAnnouncement, toggleAnnouncementPublished, deleteAnnouncement } = useApp();
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
+  
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!title.trim() || !body.trim()) return;
@@ -77,6 +80,7 @@ function AnnouncementsAdmin() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

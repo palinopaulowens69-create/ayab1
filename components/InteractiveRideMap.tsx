@@ -1,3 +1,4 @@
+// Binubuo nito ang Leaflet map, route markers, at driver location para sa booking at tracking screens.
 'use client';
 
 import { useEffect } from 'react';
@@ -5,6 +6,7 @@ import { divIcon, latLngBounds } from 'leaflet';
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from 'react-leaflet';
 import type { Driver, Place } from '@/lib/types';
 
+// Leaflet map markers distinguish pickup, destination, and driver positions.
 const pickupIcon = divIcon({
   className: 'ride-marker-wrap',
   html: '<span class="ride-marker ride-marker--pickup">P</span>',
@@ -26,10 +28,12 @@ const driverIcon = divIcon({
   iconAnchor: [19, 19],
 });
 
+// Tumatanggap ng route points at key; inaayos ang map view para kasya sa screen ang pickup, destination, at driver.
 function FitRideBounds({ points, boundsKey }: { points: [number, number][]; boundsKey: string }) {
   const map = useMap();
 
   useEffect(() => {
+    // Keep all route points in view when a booking or driver location changes.
     if (points.length === 1) {
       map.setView(points[0], 15);
       return;
@@ -40,6 +44,7 @@ function FitRideBounds({ points, boundsKey }: { points: [number, number][]; boun
   return null;
 }
 
+// Tumatanggap ng pickup, destination, optional driver, at display mode; ibinabalik ang Leaflet map at mga marker.
 export default function InteractiveRideMap({
   pickup,
   destination,
@@ -55,9 +60,11 @@ export default function InteractiveRideMap({
   const destinationPoint: [number, number] = [destination.lat, destination.lng];
   const driverPoint: [number, number] | null = driver ? [driver.lat, driver.lng] : null;
   const points = [pickupPoint, destinationPoint, ...(driverPoint ? [driverPoint] : [])];
+  // Nagbabago ang key kapag gumalaw ang alinmang marker kaya muling inaayos ang map bounds.
   const boundsKey = points.map((point) => point.join(',')).join('|');
 
   return (
+    // Interactive map layer with route line, markers, driver popup, and compact legend.
     <div className={fullBleed ? 'ride-map-fullbleed' : 'ride-map-frame'}>
       <MapContainer
         center={[17.613, 121.727]}

@@ -1,3 +1,4 @@
+<!-- Ipinapaliwanag ng file na ito ang AYAB demo, pag-setup, demo accounts, at project structure. -->
 # AYAB — Your Ride. Your way.
 
 A tricycle booking demo for Tuguegarao City, Philippines, covering commuter, driver, and admin flows. This is a full rebuild of the original AYAB concept on **Next.js + React + Tailwind CSS** instead of Ionic/Angular, specifically to avoid the web-component registration issues that broke the previous version in production. Plain React rendering has no such failure mode.

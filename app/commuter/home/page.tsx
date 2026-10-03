@@ -1,3 +1,4 @@
+// Purpose: Show the commuter dashboard.
 'use client';
 
 import Link from 'next/link';
@@ -6,6 +7,7 @@ import { BottomTabs } from '@/components/BottomTabs';
 import { BellIcon, MapPinIcon, MegaphoneIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso } from '@/lib/utils';
+
 
 function CommuterHome() {
   const { currentUser, bookings, drivers, announcements, notifications } = useApp();

@@ -1,2 +1,3 @@
+# Itinatakda nito kung aling bahagi ng site ang puwedeng i-crawl ng search robots.
 User-agent: *
 Allow: /

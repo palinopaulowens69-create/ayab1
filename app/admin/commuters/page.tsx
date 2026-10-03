@@ -1,3 +1,4 @@
+// Purpose: View commuter accounts and ride totals.
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { BottomTabs } from '@/components/BottomTabs';
 import { SearchIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { initials } from '@/lib/utils';
+
 
 function CommutersAdmin() {
   const { users, bookings, setUserStatus } = useApp();
@@ -59,6 +61,7 @@ function CommutersAdmin() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

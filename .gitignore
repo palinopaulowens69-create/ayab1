@@ -1,5 +1,7 @@
+# Inililista nito ang mga file at folder na hindi dapat isama sa Git.
 node_modules
 .next
+.next-dev
 out
 .vercel
 .env*.local

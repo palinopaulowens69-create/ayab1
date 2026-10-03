@@ -1,9 +1,12 @@
+// Gumuguhit ito ng QR code sa canvas at nagpapakita ng fallback kung pumalya ang render.
 'use client';
 
 import QRCode from 'qrcode';
 import { useEffect, useRef, useState } from 'react';
 
+// Tumatanggap ng value at optional size; iginuguhit ang QR code sa canvas o nagpapakita ng error state.
 export function QrCode({ value, size = 220 }: { value: string; size?: number }) {
+  // Render the supplied account credential as a crisp, scannable SVG code.
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [error, setError] = useState(false);
 

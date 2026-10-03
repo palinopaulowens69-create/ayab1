@@ -1,3 +1,4 @@
+// Purpose: Review and update reported incidents.
 'use client';
 
 import { useState } from 'react';
@@ -10,11 +11,13 @@ import type { Incident, IncidentStatus } from '@/lib/types';
 
 const STATUSES: IncidentStatus[] = ['Pending', 'Investigating', 'Resolved', 'Closed'];
 
+
 function badgeClass(status: IncidentStatus) {
   if (status === 'Resolved' || status === 'Closed') return 'badge-success';
   if (status === 'Investigating') return 'badge-brand';
   return 'badge-warning';
 }
+
 
 function IncidentRow({ incident }: { incident: Incident }) {
   const { updateIncidentStatus } = useApp();
@@ -59,6 +62,7 @@ function IncidentRow({ incident }: { incident: Incident }) {
   );
 }
 
+
 function IncidentsAdmin() {
   const { incidents } = useApp();
   const sorted = [...incidents].sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -79,6 +83,7 @@ function IncidentsAdmin() {
     </div>
   );
 }
+
 
 export default function Page() {
   return (

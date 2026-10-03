@@ -1,2 +1,3 @@
+# Inililista nito ang app-level Android build outputs na hindi dapat isama sa Git.
 /build/*
 !/build/.npmkeep

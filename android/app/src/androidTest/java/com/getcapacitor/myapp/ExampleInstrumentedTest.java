@@ -1,3 +1,4 @@
+// Naglalaman ito ng sample instrumented test na tumatakbo sa Android device o emulator.
 package com.getcapacitor.myapp;
 
 import static org.junit.Assert.*;
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith;
 public class ExampleInstrumentedTest {
 
     @Test
+    // Walang input; kinukuha ang app context sa device at chine-check ang package name nito.
     public void useAppContext() throws Exception {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();

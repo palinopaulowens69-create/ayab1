@@ -1,3 +1,4 @@
+// Purpose: Review and manage ride bookings.
 'use client';
 
 import { useState } from 'react';
@@ -17,12 +18,14 @@ const FILTERS: { key: BookingStatus | 'all'; label: string }[] = [
   { key: 'cancelled', label: 'Cancelled' },
 ];
 
+
 function statusBadgeClass(status: BookingStatus) {
   if (status === 'completed') return 'badge-success';
   if (status === 'cancelled') return 'badge-danger';
   if (status === 'searching') return 'badge-warning';
   return 'badge-brand';
 }
+
 
 function BookingsAdmin() {
   const { bookings, drivers } = useApp();

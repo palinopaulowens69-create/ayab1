@@ -1,9 +1,11 @@
+// Purpose: Show the commuter QR code.
 'use client';
 
 import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { QrCode } from '@/components/QrCode';
 import { useApp } from '@/lib/store';
+
 
 function CommuterQr() {
   const { currentUser } = useApp();

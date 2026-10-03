@@ -1,3 +1,4 @@
+// Purpose: Track an active ride and submit a rating.
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -11,6 +12,7 @@ import { CheckIcon, PhoneIcon, StarIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatDate, formatPeso, initials } from '@/lib/utils';
 
+
 function LucideStar({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
@@ -18,6 +20,7 @@ function LucideStar({ className }: { className?: string }) {
     </svg>
   );
 }
+
 
 function Tracking() {
   const { currentUser, bookings, drivers, verifyBooking, startTrip, completeTrip, rateBooking } = useApp();
@@ -36,11 +39,12 @@ function Tracking() {
 
   const driver = drivers.find((d) => d.id === booking?.driverId);
 
-  // Latest booking snapshot for timers below, so stale closures don't
-  // clobber a status a real driver already advanced from another tab.
+  
+  
   const bookingRef = useRef(booking);
   bookingRef.current = booking;
 
+  
   useEffect(() => {
     if (!booking) return;
     if (booking.status === 'verified') {
@@ -61,8 +65,10 @@ function Tracking() {
     }
   }, [booking, startTrip, completeTrip]);
 
+  
   function submitRating() {
     if (!booking) return;
+    
     const feedback = [...selectedTags, review.trim()].filter(Boolean).join(' · ');
     rateBooking(booking.id, rating, feedback);
     setRated(true);
@@ -88,6 +94,7 @@ function Tracking() {
     const ratingTags = ['Safe Driver', 'Punctual', 'Friendly', 'Clean Ride'];
     const visibleRating = hoverRating || rating;
 
+    
     function toggleRatingTag(tag: string) {
       setSelectedTags((tags) => tags.includes(tag) ? tags.filter((item) => item !== tag) : [...tags, tag]);
     }
@@ -125,7 +132,9 @@ function Tracking() {
                 </div>
                 <div className="ml-auto text-right">
                   <p className="font-display text-[22px] font-extrabold leading-none tracking-tight text-[#1769e0]">{formatPeso(booking.fare)}</p>
-                  <p className="mt-1 text-[9px] font-medium text-slate-400">{usesDiscountFare ? 'Discounted fare' : 'Regular fare'}</p>
+                  <p className="mt-1 text-[9px] font-medium text-slate-400">
+                    {booking.specialRide ? 'Special ride' : usesDiscountFare ? 'Discounted fare' : 'Regular fare'}
+                  </p>
                 </div>
               </div>
               <div className="my-3 h-px border-t border-dashed border-slate-200" />
@@ -159,6 +168,7 @@ function Tracking() {
               </section>
             )}
 
+            
             <section className="mt-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm" aria-label="Rate your trip">
               {hasRated ? (
                 <div className="py-3 text-center">
@@ -241,19 +251,24 @@ function Tracking() {
     <div className="shell">
       <PageHeader title="Track trip" backHref="/commuter/home" />
       <div className="page-body">
+        
         <div className="panel !mt-0">
           <StepTracker status={booking.status} />
         </div>
 
+        
         <RideMap pickup={booking.pickup} destination={booking.destination} driver={driver} />
 
+        
         <div className="panel">
           <p className="text-[13px] text-ink/50">Route</p>
           <p className="mt-0.5 text-[15px] font-semibold">
             {booking.pickup.name} → {booking.destination.name}
           </p>
           <div className="row">
-            <span className="text-[13px] text-ink/60">Fare · {usesDiscountFare ? 'Discounted' : 'Regular'}</span>
+            <span className="text-[13px] text-ink/60">
+              {booking.specialRide ? 'Special ride offer' : `Fare · ${usesDiscountFare ? 'Discounted' : 'Regular'}`}
+            </span>
             <span className="ml-auto font-display text-[16px] font-bold text-brand">
               {formatPeso(booking.fare)}
             </span>
@@ -264,6 +279,7 @@ function Tracking() {
           </div>
         </div>
 
+        
         {driver ? (
           <div className="panel">
             <div className="flex items-center gap-3">

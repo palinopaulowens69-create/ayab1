@@ -1,3 +1,4 @@
+// Purpose: View past rides.
 'use client';
 
 import { RequireRole } from '@/components/RequireRole';
@@ -7,11 +8,13 @@ import { StarIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatDate, formatPeso } from '@/lib/utils';
 
+
 function statusBadgeClass(status: string) {
   if (status === 'completed') return 'badge-success';
   if (status === 'cancelled') return 'badge-danger';
   return 'badge-brand';
 }
+
 
 function History() {
   const { currentUser, bookings, drivers } = useApp();
