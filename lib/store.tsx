@@ -76,6 +76,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (hydrated.current) return;
     hydrated.current = true;
+    const savedAnnouncements = loadItem('announcements', ANNOUNCEMENTS);
     setState({
       mounted: true,
       currentUser: loadItem('currentUser', null as User | null),
@@ -83,7 +84,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       drivers: loadItem('drivers', DRIVERS),
       bookings: loadItem('bookings', BOOKINGS),
       incidents: loadItem('incidents', INCIDENTS),
-      announcements: loadItem('announcements', ANNOUNCEMENTS),
+      announcements: savedAnnouncements.map((announcement) =>
+        announcement.id === 'an1'
+          ? { ...announcement, body: 'Maysa nga Ayab, May Tricy Agad' }
+          : announcement,
+      ),
       notifications: loadItem('notifications', [] as AppNotification[]),
     });
   }, []);
