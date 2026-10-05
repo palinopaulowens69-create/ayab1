@@ -83,8 +83,12 @@ export const BOOKINGS: Booking[] = [
     destination: PLACES[2],
     distance: 1.4,
     fare: 23.2,
+    fareCategory: 'regular',
+    passengerCount: 1,
     status: 'searching',
+    paymentStatus: 'pending_payment',
     createdAt: '2026-09-02T10:00:00+08:00',
+    driverResponseDeadline: new Date(Date.now() + 60_000).toISOString(),
   },
 ];
 

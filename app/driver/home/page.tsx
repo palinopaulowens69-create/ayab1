@@ -27,7 +27,7 @@ function DriverHome() {
   const driver = drivers.find((d) => d.id === currentUser?.id);
   const nearbyRequests = bookings.filter((b) => b.status === 'searching');
   const activeTrip = bookings.find(
-    (b) => b.driverId === currentUser?.id && ['accepted', 'verified', 'started'].includes(b.status),
+    (b) => b.driverId === currentUser?.id && ['accepted', 'verified', 'confirmed', 'started'].includes(b.status),
   );
   const firstNearbyRequest = nearbyRequests[0];
   const earningsToday = bookings

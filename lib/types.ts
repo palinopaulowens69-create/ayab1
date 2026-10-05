@@ -1,15 +1,24 @@
 // Nandito ang TypeScript types para sa users, rides, fare, incidents, anunsyo, notifications, at trip steps.
 export type Role = 'commuter' | 'driver' | 'admin';
-export type FareCategory = 'regular' | 'discounted';
+export type FareCategory = 'regular' | 'discounted' | 'special';
 
 export type BookingStatus =
   | 'searching'
   | 'accepted'
+  | 'declined'
+  | 'expired'
+  | 'pending_payment'
+  | 'payment_processing'
+  | 'payment_failed'
+  | 'paid'
   | 'verified'
-  | 'arrived'
+  | 'cancellation_grace_period'
+  | 'cancelled'
+  | 'confirmed'
   | 'started'
-  | 'completed'
-  | 'cancelled';
+  | 'completed';
+
+export type PaymentStatus = 'pending_payment' | 'payment_processing' | 'paid' | 'payment_failed' | 'refund_pending';
 
 export interface User {
   id: string;
@@ -56,8 +65,15 @@ export interface Booking {
   fare: number;
   fareCategory?: FareCategory;
   specialRide?: boolean;
+  fareOffer?: number;
+  passengerCount: number;
+  paymentStatus?: PaymentStatus;
   status: BookingStatus;
   createdAt: string;
+  updatedAt?: string;
+  driverResponseDeadline?: string;
+  cancellationDeadline?: string;
+  paymentCompletedAt?: string;
   rating?: number;
   review?: string;
 }
@@ -95,7 +111,8 @@ export interface AppNotification {
 export const TRIP_STEPS: { key: BookingStatus; label: string }[] = [
   { key: 'searching', label: 'Finding driver' },
   { key: 'accepted', label: 'Driver assigned' },
-  { key: 'verified', label: 'QR verified' },
+  { key: 'verified', label: 'Trip verified' },
+  { key: 'confirmed', label: 'Grace period ended' },
   { key: 'started', label: 'On trip' },
   { key: 'completed', label: 'Completed' },
 ];

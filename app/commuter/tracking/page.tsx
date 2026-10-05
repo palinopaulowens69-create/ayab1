@@ -10,7 +10,7 @@ import { StepTracker } from '@/components/StepTracker';
 import { RideMap } from '@/components/RideMap';
 import { CheckIcon, PhoneIcon, StarIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
-import { formatDate, formatPeso, initials } from '@/lib/utils';
+import { formatCountdown, formatDate, formatPeso, getRemainingSeconds, initials } from '@/lib/utils';
 
 
 function LucideStar({ className }: { className?: string }) {
@@ -23,7 +23,7 @@ function LucideStar({ className }: { className?: string }) {
 
 
 function Tracking() {
-  const { currentUser, bookings, drivers, verifyBooking, startTrip, completeTrip, rateBooking } = useApp();
+  const { currentUser, bookings, drivers, verifyBooking, startTrip, completeTrip, rateBooking, cancelBooking } = useApp();
   const router = useRouter();
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -31,6 +31,9 @@ function Tracking() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [rated, setRated] = useState(false);
   const [discountIdShown, setDiscountIdShown] = useState(false);
+  const [countdownSeconds, setCountdownSeconds] = useState(0);
+  const [rideProgress, setRideProgress] = useState(-1);
+  const [pickupSeconds, setPickupSeconds] = useState(30);
 
   const booking = bookings
     .filter((b) => b.passengerId === currentUser?.id)
@@ -39,31 +42,58 @@ function Tracking() {
 
   const driver = drivers.find((d) => d.id === booking?.driverId);
 
+  useEffect(() => {
+    if (!booking) return;
+    const syncCountdown = () => setCountdownSeconds(getRemainingSeconds(booking.cancellationDeadline));
+    syncCountdown();
+    const interval = window.setInterval(syncCountdown, 1000);
+    return () => window.clearInterval(interval);
+  }, [booking?.id, booking?.cancellationDeadline]);
+
   
   
   const bookingRef = useRef(booking);
   bookingRef.current = booking;
+  const completeTripRef = useRef(completeTrip);
+  completeTripRef.current = completeTrip;
 
-  
   useEffect(() => {
-    if (!booking) return;
-    if (booking.status === 'verified') {
-      const t = window.setTimeout(() => {
-        if (bookingRef.current?.id === booking.id && bookingRef.current.status === 'verified') {
-          startTrip(booking.id);
-        }
-      }, 2500);
-      return () => window.clearTimeout(t);
+    if (!booking?.id || booking.status !== 'started') return;
+    const bookingId = booking.id;
+    const pickupDuration = 30_000;
+    const rideDuration = 60_000;
+    const startedAt = Date.now();
+    setRideProgress(-1);
+    setPickupSeconds(30);
+    const progressInterval = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < pickupDuration) {
+        setPickupSeconds(Math.ceil((pickupDuration - elapsed) / 1000));
+        setRideProgress(-1);
+        return;
+      }
+      setPickupSeconds(0);
+      setRideProgress(Math.min(1, (elapsed - pickupDuration) / rideDuration));
+    }, 250);
+    const timeout = window.setTimeout(() => {
+      if (bookingRef.current?.id === bookingId && bookingRef.current.status === 'started') {
+        setRideProgress(1);
+        completeTripRef.current(bookingId);
+      }
+    }, pickupDuration + rideDuration);
+    return () => {
+      window.clearInterval(progressInterval);
+      window.clearTimeout(timeout);
     }
-    if (booking.status === 'started') {
-      const t = window.setTimeout(() => {
-        if (bookingRef.current?.id === booking.id && bookingRef.current.status === 'started') {
-          completeTrip(booking.id);
-        }
-      }, Math.max(3000, booking.distance * 1800));
-      return () => window.clearTimeout(t);
-    }
-  }, [booking, startTrip, completeTrip]);
+  }, [booking?.id, booking?.status]);
+
+  const mapDriver = driver && booking.status === 'started'
+    ? {
+        ...driver,
+        lat: booking.pickup.lat + (booking.destination.lat - booking.pickup.lat) * Math.max(0, rideProgress),
+        lng: booking.pickup.lng + (booking.destination.lng - booking.pickup.lng) * Math.max(0, rideProgress),
+      }
+    : driver;
 
   
   function submitRating() {
@@ -257,7 +287,41 @@ function Tracking() {
         </div>
 
         
-        <RideMap pickup={booking.pickup} destination={booking.destination} driver={driver} />
+        <RideMap
+          pickup={booking.pickup}
+          destination={booking.destination}
+          driver={mapDriver}
+          driverOnTrip={booking.status === 'started'}
+          simulatedDriver={booking.status === 'started'}
+        />
+
+        {booking.status === 'confirmed' && (
+          <div className="panel" role="status" aria-live="polite">
+            <p className="text-center text-[13px] font-semibold text-ink">Your trip is ready to proceed.</p>
+            <button type="button" onClick={() => startTrip(booking.id)} className="btn-primary mt-3 w-full">
+              Proceed
+            </button>
+          </div>
+        )}
+        {booking.status === 'started' && (
+          <div className="panel" role="status" aria-live="polite">
+            <p className="text-center text-[13px] font-semibold text-ink">
+              {rideProgress < 0
+                ? `Your driver is picking you up · ${pickupSeconds}s`
+                : `On the way to ${booking.destination.name} · ${Math.round(rideProgress * 100)}%`}
+            </p>
+            <div
+              className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"
+              role="progressbar"
+              aria-label="Simulated trip progress"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.max(0, Math.round(rideProgress * 100))}
+            >
+              <div className="h-full rounded-full bg-[#1769e0] transition-[width] duration-300" style={{ width: `${Math.max(0, rideProgress * 100)}%` }} />
+            </div>
+          </div>
+        )}
 
         
         <div className="panel">
@@ -310,17 +374,34 @@ function Tracking() {
                     <span>I have shown my valid student, senior citizen, or PWD ID to the driver.</span>
                   </label>
                 )}
+                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-[12px] text-amber-800">
+                  Payment is required before the ride can be verified.
+                </div>
                 <button
                   onClick={() => verifyBooking(booking.id)}
                   disabled={usesDiscountFare && !discountIdShown}
                   className="btn-primary mt-3"
                 >
-                  <CheckIcon width={17} height={17} /> Verify driver&apos;s QR
+                  <CheckIcon width={17} height={17} /> Pay {formatPeso(booking.fare)} now
                 </button>
               </>
             )}
             {booking.status === 'verified' && (
-              <p className="mt-3 text-center text-[13px] text-ink/50">Driver verified. Starting trip…</p>
+              <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center text-[12px] text-emerald-800">
+                <p className="font-semibold">Trip verified</p>
+                <p className="mt-1">Cancellation grace period: {formatCountdown(countdownSeconds)}</p>
+              </div>
+            )}
+            {booking.status === 'verified' && countdownSeconds === 0 && (
+              <p className="mt-3 text-center text-[13px] text-ink/50">Grace period ended. Trip confirmed.</p>
+            )}
+            {booking.status === 'confirmed' && (
+              <p className="mt-3 text-center text-[13px] text-ink/50">Grace period ended. Your trip is confirmed.</p>
+            )}
+            {booking.status === 'verified' && countdownSeconds > 0 && (
+              <button onClick={() => cancelBooking(booking.id)} className="btn-outline mt-3 w-full">
+                Cancel within grace period
+              </button>
             )}
             {booking.status === 'started' && (
               <p className="mt-3 text-center text-[13px] text-ink/50">Enjoy your ride!</p>

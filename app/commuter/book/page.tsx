@@ -85,35 +85,55 @@ function PlaceSearch({
 }
 
 function BookRide() {
-  const { drivers, createBooking, acceptBooking } = useApp();
+  const { drivers, createBooking } = useApp();
   const router = useRouter();
   const [pickupId, setPickupId] = useState(PLACES[0].id);
   const [destinationId, setDestinationId] = useState(PLACES[2].id);
   const [fareCategory, setFareCategory] = useState<FareCategory>('regular');
-  const [specialRide, setSpecialRide] = useState(false);
+  const [passengerCount, setPassengerCount] = useState(1);
   const [specialFareInput, setSpecialFareInput] = useState('');
   const [requesting, setRequesting] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
 
   const pickup = PLACES.find((p) => p.id === pickupId) ?? PLACES[0];
   const destination = PLACES.find((p) => p.id === destinationId) ?? PLACES[2];
   const hasBothPlaces = Boolean(pickupId && destinationId);
   const sameStop = hasBothPlaces && pickupId === destinationId;
-  const minimumFare = estimateFareForCategory(destination, fareCategory);
+  const specialRide = fareCategory === 'special';
+  const minimumFare = estimateFareForCategory(destination, specialRide ? 'regular' : fareCategory) * passengerCount;
   const enteredSpecialFare = Number(specialFareInput);
   const validSpecialFare = Number.isFinite(enteredSpecialFare) && enteredSpecialFare >= minimumFare;
-  const fare = specialRide && validSpecialFare ? enteredSpecialFare : minimumFare;
+  const fare = specialRide ? (validSpecialFare ? enteredSpecialFare : minimumFare) : minimumFare;
   const availableDrivers = drivers.filter((d) => d.online && d.verified);
 
   function requestRide() {
-    if (!hasBothPlaces || sameStop || availableDrivers.length === 0 || requesting || (specialRide && !validSpecialFare)) return;
-    setRequesting(true);
-    const booking = createBooking(pickup, destination, fareCategory, specialRide ? enteredSpecialFare : undefined);
-    router.push('/commuter/tracking');
-
-    const candidate = availableDrivers[Math.floor(Math.random() * availableDrivers.length)];
-    if (candidate) {
-      window.setTimeout(() => acceptBooking(booking.id, candidate.id), 2200);
+    if (!hasBothPlaces || sameStop) {
+      setValidationMessage('Please choose both a pickup point and destination.');
+      return;
     }
+    if (!Number.isFinite(passengerCount) || passengerCount < 1) {
+      setValidationMessage('Please select a valid number of passengers.');
+      return;
+    }
+    if (availableDrivers.length === 0) {
+      setValidationMessage('No drivers are available right now.');
+      return;
+    }
+    if (specialRide && !validSpecialFare) {
+      setValidationMessage('Enter a valid fare offer for this special trip.');
+      return;
+    }
+
+    setRequesting(true);
+    setValidationMessage('');
+    createBooking(
+      pickup,
+      destination,
+      fareCategory,
+      specialRide ? enteredSpecialFare : undefined,
+      passengerCount,
+    );
+    router.push('/commuter/tracking');
   }
 
   return (
@@ -156,10 +176,11 @@ function BookRide() {
         </div>
 
         
-        <div role="group" aria-label="Passenger fare type" className="grid grid-cols-2 gap-1.5 rounded-2xl bg-[#f1f4f8] p-1.5 ">
+        <div role="group" aria-label="Passenger fare type" className="grid grid-cols-3 gap-1.5 rounded-2xl bg-[#f1f4f8] p-1.5">
           {([
             ['regular', 'Regular', 'Standard fare'],
             ['discounted', 'Discounted', 'Student · Senior · PWD'],
+            ['special', 'Special', 'Custom offer'],
           ] as [FareCategory, string, string][]).map(([value, label, detail]) => {
             const selected = fareCategory === value;
             return (
@@ -167,36 +188,54 @@ function BookRide() {
                 key={value}
                 type="button"
                 aria-pressed={selected}
-                onClick={() => setFareCategory(value)}
-                className={`flex min-h-[54px] flex-col items-start justify-center rounded-xl px-3 text-left transition duration-150 ${selected ? 'bg-[#1769e0] text-white shadow-sm ' : 'text-[#65758a] hover:bg-white/80  '}`}
+                onClick={() => {
+                  setFareCategory(value);
+                  if (value !== 'special') setSpecialFareInput('');
+                }}
+                className={`flex min-h-[54px] flex-col items-start justify-center rounded-xl px-2 text-left transition duration-150 ${selected ? 'bg-[#1769e0] text-white shadow-sm' : 'text-[#65758a] hover:bg-white/80'}`}
               >
                 <span className="text-[12px] font-semibold leading-4">{label}</span>
-                <span className={`mt-0.5 text-[9px] leading-3 ${selected ? 'text-white/75' : 'text-[#93a0af] '}`}>{detail}</span>
+                <span className={`mt-0.5 text-[9px] leading-3 ${selected ? 'text-white/75' : 'text-[#93a0af]'}`}>{detail}</span>
               </button>
             );
           })}
         </div>
 
-        {fareCategory === 'discounted' && (
-          <p className="mt-2 text-[10px] leading-4 text-[#8794a4] ">Please show a valid student, senior citizen, or PWD ID to your driver.</p>
-        )}
+        <div className="mt-3 rounded-xl border border-[#e6ebf1] bg-[#f8fafc] p-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.11em] text-[#8290a3]">Number of passengers</p>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setPassengerCount((count) => Math.max(1, count - 1))}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dfe7f0] bg-white text-[20px] font-medium text-[#3a4d64]"
+              aria-label="Decrease passengers"
+            >
+              −
+            </button>
+            <div className="min-w-[90px] text-center">
+              <span className="font-display text-[30px] font-extrabold leading-none tracking-[-0.04em] text-[#1b2e47]">{passengerCount}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setPassengerCount((count) => Math.min(8, count + 1))}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dfe7f0] bg-white text-[20px] font-medium text-[#3a4d64]"
+              aria-label="Increase passengers"
+            >
+              +
+            </button>
+          </div>
+        </div>
 
-        <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-[#e6ebf1] px-3 text-[12px] font-semibold text-[#34465c]  ">
-          <input
-            type="checkbox"
-            checked={specialRide}
-            onChange={(event) => setSpecialRide(event.target.checked)}
-            className="h-4 w-4 rounded border-[#c7d2df] text-[#1769e0] focus:ring-[#1769e0]"
-          />
-          Special ride — enter your fare
-        </label>
+        {fareCategory === 'discounted' && (
+          <p className="mt-2 text-[10px] leading-4 text-[#8794a4]">Student, senior citizen, or PWD verification applies to the rider using the app.</p>
+        )}
 
         {specialRide && (
           <div className="mt-2">
-            <label htmlFor="special-ride-fare" className="mb-1 block text-[11px] font-medium text-[#7b899a] ">
-              Your offered fare (minimum {formatPeso(minimumFare)})
+            <label htmlFor="special-ride-fare" className="mb-1 block text-[11px] font-medium text-[#7b899a]">
+              Your Offer (minimum {formatPeso(minimumFare)})
             </label>
-            <div className="flex items-center rounded-xl border border-[#dfe5ec] bg-white px-3  ">
+            <div className="flex items-center rounded-xl border border-[#dfe5ec] bg-white px-3">
               <span className="mr-2 text-[13px] text-[#8491a1]">₱</span>
               <input
                 id="special-ride-fare"
@@ -207,14 +246,12 @@ function BookRide() {
                 value={specialFareInput}
                 onChange={(event) => setSpecialFareInput(event.target.value)}
                 placeholder={minimumFare.toFixed(2)}
-                className="h-10 w-full border-0 bg-transparent p-0 text-[13px] font-semibold text-[#26384f] outline-none focus:ring-0 "
+                className="h-10 w-full border-0 bg-transparent p-0 text-[13px] font-semibold text-[#26384f] outline-none focus:ring-0"
                 required
               />
             </div>
             {specialFareInput && !validSpecialFare && (
-              <p className="mt-1 text-[10px] text-red-600 ">
-                Enter at least {formatPeso(minimumFare)} for this fare type.
-              </p>
+              <p className="mt-1 text-[10px] text-red-600">Enter at least {formatPeso(minimumFare)} for this fare type.</p>
             )}
           </div>
         )}

@@ -7,20 +7,20 @@ import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { StepTracker } from '@/components/StepTracker';
 import { RideMap } from '@/components/RideMap';
-import { CheckIcon, PhoneIcon } from '@/components/Icons';
+import { PhoneIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso, initials } from '@/lib/utils';
 
 
 function Trip() {
-  const { currentUser, bookings, users, drivers, updateDriverLocation, verifyBooking, startTrip, completeTrip } = useApp();
+  const { currentUser, bookings, users, drivers, updateDriverLocation, startTrip, completeTrip } = useApp();
   const router = useRouter();
   const lastLocationSent = useRef(0);
 
   const trip = bookings
     .filter((b) => b.driverId === currentUser?.id)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
-    .find((b) => ['accepted', 'verified', 'started', 'completed'].includes(b.status));
+    .find((b) => ['accepted', 'verified', 'confirmed', 'started', 'completed'].includes(b.status));
 
   const passenger = users.find((u) => u.id === trip?.passengerId);
   const driver = drivers.find((d) => d.id === currentUser?.id);
@@ -90,6 +90,10 @@ function Trip() {
             </span>
           </div>
           <div className="row">
+            <span className="text-[13px] text-ink/60">Passengers</span>
+            <span className="ml-auto text-[13px] text-ink/60">{trip.passengerCount}</span>
+          </div>
+          <div className="row">
             <span className="text-[13px] text-ink/60">Booking code</span>
             <span className="ml-auto data-chip">{trip.id}</span>
           </div>
@@ -97,11 +101,12 @@ function Trip() {
 
         
         {trip.status === 'accepted' && (
-          <button onClick={() => verifyBooking(trip.id)} className="btn-primary mt-2">
-            <CheckIcon width={17} height={17} /> Scan passenger QR to verify
-          </button>
+          <p className="panel mt-2 text-center text-[13px] text-ink/60">Waiting for the commuter to complete payment and verification.</p>
         )}
         {trip.status === 'verified' && (
+          <p className="panel mt-2 text-center text-[13px] text-ink/60">Payment verified. The commuter cancellation grace period is active.</p>
+        )}
+        {trip.status === 'confirmed' && (
           <button onClick={() => startTrip(trip.id)} className="btn-primary mt-2">
             Start trip
           </button>

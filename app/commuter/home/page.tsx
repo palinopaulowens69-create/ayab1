@@ -14,7 +14,7 @@ function CommuterHome() {
 
   const myBookings = bookings.filter((b) => b.passengerId === currentUser?.id);
   const activeBooking = myBookings.find((b) =>
-    ['searching', 'accepted', 'verified', 'started'].includes(b.status),
+    ['searching', 'accepted', 'verified', 'confirmed', 'started'].includes(b.status),
   );
   const completedCount = myBookings.filter((b) => b.status === 'completed').length;
   const nearbyDrivers = drivers.filter((d) => d.online && d.verified).length;

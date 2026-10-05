@@ -50,18 +50,22 @@ export default function InteractiveRideMap({
   destination,
   driver,
   fullBleed = false,
+  driverOnTrip = false,
+  simulatedDriver = false,
 }: {
   pickup: Place;
   destination: Place;
   driver: Driver | null;
   fullBleed?: boolean;
+  driverOnTrip?: boolean;
+  simulatedDriver?: boolean;
 }) {
   const pickupPoint: [number, number] = [pickup.lat, pickup.lng];
   const destinationPoint: [number, number] = [destination.lat, destination.lng];
   const driverPoint: [number, number] | null = driver ? [driver.lat, driver.lng] : null;
   const points = [pickupPoint, destinationPoint, ...(driverPoint ? [driverPoint] : [])];
   // Nagbabago ang key kapag gumalaw ang alinmang marker kaya muling inaayos ang map bounds.
-  const boundsKey = points.map((point) => point.join(',')).join('|');
+  const boundsKey = `${pickupPoint.join(',')}|${destinationPoint.join(',')}|${driver ? 'driver' : 'no-driver'}`;
 
   return (
     // Interactive map layer with route line, markers, driver popup, and compact legend.
@@ -82,11 +86,11 @@ export default function InteractiveRideMap({
         <Polyline positions={[pickupPoint, destinationPoint]} pathOptions={{ color: '#1769E0', weight: 5, opacity: 0.8 }} />
         {driverPoint && (
           <>
-            <Polyline positions={[driverPoint, pickupPoint]} pathOptions={{ color: '#52647A', weight: 3, dashArray: '7 8', opacity: 0.8 }} />
+            {!driverOnTrip && <Polyline positions={[driverPoint, pickupPoint]} pathOptions={{ color: '#52647A', weight: 3, dashArray: '7 8', opacity: 0.8 }} />}
             <Marker position={driverPoint} icon={driverIcon}>
               <Popup>
                 <strong>{driver?.name}</strong>
-                <br />{driver?.locationUpdatedAt ? 'Live GPS location' : 'Last shared location'}
+                <br />{simulatedDriver ? 'Simulated trip location' : driver?.locationUpdatedAt ? 'Live GPS location' : 'Last shared location'}
               </Popup>
             </Marker>
           </>

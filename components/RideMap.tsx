@@ -16,16 +16,27 @@ export function RideMap({
   destination,
   driver,
   fullBleed = false,
+  driverOnTrip = false,
+  simulatedDriver = false,
 }: {
   pickup: Place;
   destination: Place;
   driver?: Driver | null;
   fullBleed?: boolean;
+  driverOnTrip?: boolean;
+  simulatedDriver?: boolean;
 }) {
   return (
     // Stable wrapper lets screens choose an inset map or an edge-to-edge map.
     <div className={fullBleed ? 'ride-map-fullbleed' : undefined}>
-      <InteractiveRideMap pickup={pickup} destination={destination} driver={driver ?? null} fullBleed={fullBleed} />
+      <InteractiveRideMap
+        pickup={pickup}
+        destination={destination}
+        driver={driver ?? null}
+        fullBleed={fullBleed}
+        driverOnTrip={driverOnTrip}
+        simulatedDriver={simulatedDriver}
+      />
     </div>
   );
 }

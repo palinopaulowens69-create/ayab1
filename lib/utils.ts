@@ -36,6 +36,19 @@ export function formatPeso(amount: number): string {
   return `₱${amount.toFixed(2)}`;
 }
 
+export function getRemainingSeconds(deadline?: string | null): number {
+  if (!deadline) return 0;
+  const remainingMs = new Date(deadline).getTime() - Date.now();
+  return Math.max(0, Math.ceil(remainingMs / 1000));
+}
+
+export function formatCountdown(totalSeconds: number): string {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const minutes = Math.floor(safeSeconds / 60);
+  const seconds = safeSeconds % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 // Tumatanggap ng ISO date string at ibinabalik ang mas madaling basahing petsa at oras; ginagamit ang original string kung hindi ma-format.
 export function formatDate(iso: string): string {
   try {

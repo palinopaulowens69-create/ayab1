@@ -10,15 +10,14 @@ import { formatPeso } from '@/lib/utils';
 
 
 function Requests() {
-  const { currentUser, drivers, bookings, acceptBooking } = useApp();
+  const { currentUser, drivers, bookings, acceptBooking, declineBooking } = useApp();
   const router = useRouter();
   const driver = drivers.find((d) => d.id === currentUser?.id);
   const requests = bookings.filter((b) => b.status === 'searching');
   const hasActiveTrip = bookings.some(
-    (b) => b.driverId === currentUser?.id && ['accepted', 'verified', 'started'].includes(b.status),
+    (b) => b.driverId === currentUser?.id && ['accepted', 'verified', 'confirmed', 'started'].includes(b.status),
   );
 
-  
   function accept(bookingId: string) {
     if (!currentUser) return;
     acceptBooking(bookingId, currentUser.id);
@@ -46,30 +45,53 @@ function Requests() {
             <p className="text-[13px]">New commuter bookings will show up here.</p>
           </div>
         ) : (
-          requests.map((r) => (
-            <div key={r.id} className="panel">
-              <p className="text-[14px] font-semibold">
-                {r.pickup.name} → {r.destination.name}
-              </p>
-              <div className="row">
-                <span className="text-[13px] text-ink/60">{r.passengerName}</span>
-                <span className="ml-auto text-[13px] text-ink/60">{r.distance.toFixed(1)} km</span>
+          requests.map((r) => {
+            const timer = Math.max(0, Math.ceil((new Date(r.driverResponseDeadline ?? Date.now()).getTime() - Date.now()) / 1000));
+            return (
+              <div key={r.id} className="panel">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-[14px] font-semibold">
+                    {r.pickup.name} → {r.destination.name}
+                  </p>
+                  <span className="rounded-full bg-brand/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-brand">
+                    {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}
+                  </span>
+                </div>
+                <div className="row">
+                  <span className="text-[13px] text-ink/60">{r.passengerName}</span>
+                  <span className="ml-auto text-[13px] text-ink/60">{r.distance.toFixed(1)} km</span>
+                </div>
+                <div className="row">
+                  <span className="text-[13px] text-ink/60">Passengers</span>
+                  <span className="ml-auto text-[13px] text-ink/60">{r.passengerCount}</span>
+                </div>
+                <div className="row">
+                  <span className="text-[13px] text-ink/60">{r.specialRide ? 'Special ride offer' : 'Fare'}</span>
+                  <span className="ml-auto font-display text-[16px] font-bold text-brand">
+                    {formatPeso(r.fare)}
+                  </span>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => declineBooking(r.id)}
+                    disabled={!driver?.online || hasActiveTrip}
+                    className="btn-outline flex-1"
+                  >
+                    Decline
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => accept(r.id)}
+                    disabled={!driver?.online || hasActiveTrip}
+                    className="btn-primary flex-1"
+                  >
+                    Accept request
+                  </button>
+                </div>
               </div>
-              <div className="row">
-                <span className="text-[13px] text-ink/60">{r.specialRide ? 'Special ride offer' : 'Fare'}</span>
-                <span className="ml-auto font-display text-[16px] font-bold text-brand">
-                  {formatPeso(r.fare)}
-                </span>
-              </div>
-              <button
-                onClick={() => accept(r.id)}
-                disabled={!driver?.online || hasActiveTrip}
-                className="btn-primary mt-2"
-              >
-                Accept request
-              </button>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
       <BottomTabs role="driver" />
