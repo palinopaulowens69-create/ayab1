@@ -249,11 +249,51 @@ button, a, input, select, textarea {
 
   .ride-map-fullbleed .leaflet-control-attribution {
     bottom: auto;
-    top: 8px;
+    top: calc(env(safe-area-inset-top) + 8px);
     right: 8px;
     border-radius: 6px;
     background: rgb(255 255 255 / 75%);
     font-size: 9px;
+  }
+
+  .booking-screen {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .booking-top-controls {
+    top: calc(env(safe-area-inset-top) + 8px);
+  }
+
+  .booking-top-card {
+    max-height: min(30dvh, 260px);
+  }
+
+  .booking-fare-sheet {
+    max-height: min(58dvh, 520px);
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .booking-fare-sheet__content {
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .booking-fare-sheet__footer {
+    flex: 0 0 auto;
+    padding-top: 10px;
+    background: linear-gradient(to bottom, rgb(255 255 255 / 88%), white 24%);
+  }
+
+  @media (max-height: 700px) {
+    .booking-top-card {
+      max-height: min(26dvh, 190px);
+    }
+
+    .booking-fare-sheet {
+      max-height: min(58dvh, 400px);
+    }
   }
 
   .ride-map-loading {

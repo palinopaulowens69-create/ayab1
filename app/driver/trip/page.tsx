@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RequireRole } from '@/components/RequireRole';
 import { PageHeader } from '@/components/PageHeader';
 import { StepTracker } from '@/components/StepTracker';
@@ -10,12 +10,16 @@ import { RideMap } from '@/components/RideMap';
 import { PhoneIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatPeso, initials } from '@/lib/utils';
+import { fetchDrivingRoute, type DrivingRoute } from '@/lib/routing';
 
 
 function Trip() {
   const { currentUser, bookings, users, drivers, updateDriverLocation, startTrip, completeTrip } = useApp();
   const router = useRouter();
   const lastLocationSent = useRef(0);
+  const [roadRoute, setRoadRoute] = useState<DrivingRoute | null>(null);
+  const [routeError, setRouteError] = useState('');
+  const [routeRetry, setRouteRetry] = useState(0);
 
   const trip = bookings
     .filter((b) => b.driverId === currentUser?.id)
@@ -24,6 +28,45 @@ function Trip() {
 
   const passenger = users.find((u) => u.id === trip?.passengerId);
   const driver = drivers.find((d) => d.id === currentUser?.id);
+
+  useEffect(() => {
+    const activeTrip = trip;
+    if (!activeTrip) {
+      setRoadRoute(null);
+      setRouteError('');
+      return;
+    }
+
+    const controller = new AbortController();
+    const pickup: [number, number] = [activeTrip.pickup.lat, activeTrip.pickup.lng];
+    const destination: [number, number] = [activeTrip.destination.lat, activeTrip.destination.lng];
+    setRoadRoute(null);
+    setRouteError('');
+
+    async function loadRoadRoute() {
+      try {
+        const route = await fetchDrivingRoute(
+          pickup,
+          destination,
+          controller.signal,
+        );
+        if (!controller.signal.aborted) setRoadRoute(route);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setRouteError(error instanceof Error ? error.message : 'Unable to load the driving route.');
+      }
+    }
+
+    void loadRoadRoute();
+    return () => controller.abort();
+  }, [
+    trip?.id,
+    trip?.pickup.lat,
+    trip?.pickup.lng,
+    trip?.destination.lat,
+    trip?.destination.lng,
+    routeRetry,
+  ]);
 
   useEffect(() => {
     if (!trip || !driver?.online || trip.status === 'completed' || !currentUser || !navigator.geolocation) return;
@@ -63,7 +106,22 @@ function Trip() {
           <StepTracker status={trip.status} />
         </div>
 
-        <RideMap pickup={trip.pickup} destination={trip.destination} driver={driver} />
+        <RideMap
+          pickup={roadRoute ? { ...trip.pickup, lat: roadRoute.pickup[0], lng: roadRoute.pickup[1] } : trip.pickup}
+          destination={roadRoute ? { ...trip.destination, lat: roadRoute.destination[0], lng: roadRoute.destination[1] } : trip.destination}
+          driver={driver}
+          route={roadRoute?.points}
+          hideUnroutedLine
+        />
+        {routeError && (
+          <div className="panel" role="alert">
+            <p className="text-[13px] font-semibold text-rose-700">Unable to load the driving route.</p>
+            <p className="mt-1 text-[12px] text-ink/60">{routeError}</p>
+            <button type="button" onClick={() => setRouteRetry((attempt) => attempt + 1)} className="btn-outline mt-3 w-full">
+              Retry route
+            </button>
+          </div>
+        )}
         {trip.status !== 'completed' && (
           <p className="mt-2 text-[11px] leading-4 text-ink/50">Allow location access and keep this trip open to share your live driver position.</p>
         )}

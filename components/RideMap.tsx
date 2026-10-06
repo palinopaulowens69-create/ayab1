@@ -18,6 +18,11 @@ export function RideMap({
   fullBleed = false,
   driverOnTrip = false,
   simulatedDriver = false,
+  route,
+  allowLocationSelection = false,
+  onPickupChange,
+  onDestinationChange,
+  hideUnroutedLine = false,
 }: {
   pickup: Place;
   destination: Place;
@@ -25,6 +30,11 @@ export function RideMap({
   fullBleed?: boolean;
   driverOnTrip?: boolean;
   simulatedDriver?: boolean;
+  route?: [number, number][];
+  allowLocationSelection?: boolean;
+  onPickupChange?: (point: [number, number]) => void;
+  onDestinationChange?: (point: [number, number]) => void;
+  hideUnroutedLine?: boolean;
 }) {
   return (
     // Stable wrapper lets screens choose an inset map or an edge-to-edge map.
@@ -36,6 +46,11 @@ export function RideMap({
         fullBleed={fullBleed}
         driverOnTrip={driverOnTrip}
         simulatedDriver={simulatedDriver}
+        route={route}
+        allowLocationSelection={allowLocationSelection}
+        onPickupChange={onPickupChange}
+        onDestinationChange={onDestinationChange}
+        hideUnroutedLine={hideUnroutedLine}
       />
     </div>
   );

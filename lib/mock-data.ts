@@ -3,9 +3,9 @@ import type { Announcement, Booking, Driver, Incident, Place, User } from './typ
 
 // Mga lugar sa Tuguegarao at fare matrix para sa bawat destination.
 export const PLACES: Place[] = [
-  { id: 'p1', name: 'Mababalan Sur', lat: 17.603, lng: 121.718, discountedFare: 20, regularFare: 33 },
-  { id: 'p2', name: 'Mababalan Norte', lat: 17.608, lng: 121.718, discountedFare: 20, regularFare: 30 },
-  { id: 'p3', name: 'Dadda', lat: 17.610, lng: 121.722, discountedFare: 20, regularFare: 27 },
+  { id: 'p1', name: 'Namabbalan Sur (Mababalan Sur)', lat: 17.547379, lng: 121.784107, discountedFare: 20, regularFare: 33 },
+  { id: 'p2', name: 'Namabbalan Norte (Mababalan Norte)', lat: 17.553597, lng: 121.782827, discountedFare: 20, regularFare: 30 },
+  { id: 'p3', name: 'Dadda', lat: 17.565849, lng: 121.778454, discountedFare: 20, regularFare: 27 },
   { id: 'p4', name: 'Tagga', lat: 17.612, lng: 121.722, discountedFare: 20, regularFare: 25 },
   { id: 'p5', name: 'Gosi Sur', lat: 17.616, lng: 121.716, discountedFare: 20, regularFare: 25 },
   { id: 'p6', name: 'Gosi Norte', lat: 17.620, lng: 121.716, discountedFare: 20, regularFare: 25 },

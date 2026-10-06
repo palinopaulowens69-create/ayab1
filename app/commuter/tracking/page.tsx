@@ -11,7 +11,7 @@ import { RideMap } from '@/components/RideMap';
 import { CheckIcon, PhoneIcon, StarIcon } from '@/components/Icons';
 import { useApp } from '@/lib/store';
 import { formatCountdown, formatDate, formatPeso, getRemainingSeconds, initials } from '@/lib/utils';
-
+import { fetchDrivingRoute, getPointAlongRoute, type DrivingRoute } from '@/lib/routing';
 
 function LucideStar({ className }: { className?: string }) {
   return (
@@ -34,13 +34,58 @@ function Tracking() {
   const [countdownSeconds, setCountdownSeconds] = useState(0);
   const [rideProgress, setRideProgress] = useState(-1);
   const [pickupSeconds, setPickupSeconds] = useState(30);
+  const [roadRoute, setRoadRoute] = useState<DrivingRoute | null>(null);
+  const [routeError, setRouteError] = useState('');
+  const [routeRetry, setRouteRetry] = useState(0);
 
   const booking = bookings
     .filter((b) => b.passengerId === currentUser?.id)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))[0];
-  const usesDiscountFare = Boolean(booking?.fareCategory && booking.fareCategory !== 'regular');
+  const usesDiscountFare = booking?.fareCategory === 'discounted';
 
   const driver = drivers.find((d) => d.id === booking?.driverId);
+
+  useEffect(() => {
+    setDiscountIdShown(false);
+  }, [booking?.id]);
+
+  useEffect(() => {
+    if (!booking || booking.status !== 'started') {
+      setRoadRoute(null);
+      setRouteError('');
+      return;
+    }
+
+    const controller = new AbortController();
+    setRoadRoute(null);
+    setRouteError('');
+    setRideProgress(-1);
+
+    async function loadRoadRoute() {
+      try {
+        const route = await fetchDrivingRoute(
+          [booking.pickup.lat, booking.pickup.lng],
+          [booking.destination.lat, booking.destination.lng],
+          controller.signal,
+        );
+        if (!controller.signal.aborted) setRoadRoute(route);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setRouteError(error instanceof Error ? error.message : 'Unable to load the driving route.');
+      }
+    }
+
+    void loadRoadRoute();
+    return () => controller.abort();
+  }, [
+    booking?.id,
+    booking?.status,
+    booking?.pickup.lat,
+    booking?.pickup.lng,
+    booking?.destination.lat,
+    booking?.destination.lng,
+    routeRetry,
+  ]);
 
   useEffect(() => {
     if (!booking) return;
@@ -58,7 +103,7 @@ function Tracking() {
   completeTripRef.current = completeTrip;
 
   useEffect(() => {
-    if (!booking?.id || booking.status !== 'started') return;
+    if (!booking?.id || booking.status !== 'started' || !roadRoute) return;
     const bookingId = booking.id;
     const pickupDuration = 30_000;
     const rideDuration = 60_000;
@@ -85,13 +130,20 @@ function Tracking() {
       window.clearInterval(progressInterval);
       window.clearTimeout(timeout);
     }
-  }, [booking?.id, booking?.status]);
+  }, [booking?.id, booking?.status, roadRoute]);
 
+  const routePosition = roadRoute ? getPointAlongRoute(roadRoute.points, Math.max(0, rideProgress)) : null;
+  const mapPickup = roadRoute
+    ? { ...booking.pickup, lat: roadRoute.pickup[0], lng: roadRoute.pickup[1] }
+    : booking.pickup;
+  const mapDestination = roadRoute
+    ? { ...booking.destination, lat: roadRoute.destination[0], lng: roadRoute.destination[1] }
+    : booking.destination;
   const mapDriver = driver && booking.status === 'started'
     ? {
         ...driver,
-        lat: booking.pickup.lat + (booking.destination.lat - booking.pickup.lat) * Math.max(0, rideProgress),
-        lng: booking.pickup.lng + (booking.destination.lng - booking.pickup.lng) * Math.max(0, rideProgress),
+        lat: routePosition?.[0] ?? driver.lat,
+        lng: routePosition?.[1] ?? driver.lng,
       }
     : driver;
 
@@ -288,11 +340,13 @@ function Tracking() {
 
         
         <RideMap
-          pickup={booking.pickup}
-          destination={booking.destination}
+          pickup={mapPickup}
+          destination={mapDestination}
           driver={mapDriver}
           driverOnTrip={booking.status === 'started'}
           simulatedDriver={booking.status === 'started'}
+          route={booking.status === 'started' ? roadRoute?.points : undefined}
+          hideUnroutedLine
         />
 
         {booking.status === 'confirmed' && (
@@ -306,20 +360,33 @@ function Tracking() {
         {booking.status === 'started' && (
           <div className="panel" role="status" aria-live="polite">
             <p className="text-center text-[13px] font-semibold text-ink">
-              {rideProgress < 0
+              {!roadRoute
+                ? routeError ? 'Road route unavailable · driver movement paused' : 'Loading road route…'
+                : rideProgress < 0
                 ? `Your driver is picking you up · ${pickupSeconds}s`
                 : `On the way to ${booking.destination.name} · ${Math.round(rideProgress * 100)}%`}
             </p>
-            <div
-              className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"
-              role="progressbar"
-              aria-label="Simulated trip progress"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.max(0, Math.round(rideProgress * 100))}
-            >
-              <div className="h-full rounded-full bg-[#1769e0] transition-[width] duration-300" style={{ width: `${Math.max(0, rideProgress * 100)}%` }} />
-            </div>
+            {roadRoute && (
+              <div
+                className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"
+                role="progressbar"
+                aria-label="Simulated trip progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.max(0, Math.round(rideProgress * 100))}
+              >
+                <div className="h-full rounded-full bg-[#1769e0] transition-[width] duration-300" style={{ width: `${Math.max(0, rideProgress * 100)}%` }} />
+              </div>
+            )}
+          </div>
+        )}
+        {booking.status === 'started' && routeError && (
+          <div className="panel" role="alert">
+            <p className="text-[13px] font-semibold text-rose-700">Unable to load the driving route.</p>
+            <p className="mt-1 text-[12px] text-ink/60">{routeError} Driver movement is paused until a road route loads.</p>
+            <button type="button" onClick={() => setRouteRetry((attempt) => attempt + 1)} className="btn-outline mt-3 w-full">
+              Retry route
+            </button>
           </div>
         )}
 

@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { ANNOUNCEMENTS, BOOKINGS, DRIVERS, INCIDENTS, USERS } from './mock-data';
+import { ANNOUNCEMENTS, BOOKINGS, DRIVERS, INCIDENTS, PLACES, USERS } from './mock-data';
 import { clearAllAyabData, loadItem, saveItem } from './storage';
 import { distanceKm, estimateFareForCategory, newId } from './utils';
 import type {
@@ -85,12 +85,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (hydrated.current) return;
     hydrated.current = true;
     const savedAnnouncements = loadItem('announcements', ANNOUNCEMENTS);
+    const savedBookings = loadItem('bookings', BOOKINGS).map((booking) => ({
+      ...booking,
+      pickup:
+        booking.pickup.id === 'p1' && booking.pickup.lat === 17.603 && booking.pickup.lng === 121.718
+          ? PLACES[0]
+          : booking.pickup,
+      destination:
+        booking.destination.id === 'p3' && booking.destination.lat === 17.610 && booking.destination.lng === 121.722
+          ? PLACES[2]
+          : booking.destination,
+    }));
     setState({
       mounted: true,
       currentUser: loadItem('currentUser', null as User | null),
       users: loadItem('users', USERS),
       drivers: loadItem('drivers', DRIVERS),
-      bookings: loadItem('bookings', BOOKINGS),
+      bookings: savedBookings,
       incidents: loadItem('incidents', INCIDENTS),
       announcements: savedAnnouncements.map((announcement) =>
         announcement.id === 'an1'
