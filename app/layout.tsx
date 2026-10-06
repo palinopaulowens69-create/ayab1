@@ -28,7 +28,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AYAB — Your Ride. Your way.',
+  title: 'AYAB',
   description:
     'AYAB is a tricycle booking platform for Tuguegarao City, Philippines, connecting commuters, drivers, and operators.',
 };
